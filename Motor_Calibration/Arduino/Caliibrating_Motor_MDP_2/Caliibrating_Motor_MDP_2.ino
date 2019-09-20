@@ -36,6 +36,7 @@ while (collectData){
     noInterrupts();
     timing = pulseIn(encoderB, HIGH, 50000UL);
     interrupts();
+
     //timingB = pulseIn(encoderA, HIGH);
     if (sample <= sampleTo && sample >= sampleFrom)
       {Serial.println(timing);}

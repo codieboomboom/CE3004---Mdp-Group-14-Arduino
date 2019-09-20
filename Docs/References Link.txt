@@ -1,0 +1,8 @@
+PID Library:
+https://playground.arduino.cc/Code/PIDLibrary/
+
+SharpIR Library:
+https://github.com/guillaume-rico/SharpIR
+
+Tuning PID:
+https://robotics.stackexchange.com/questions/167/what-are-good-strategies-for-tuning-pid-loops
