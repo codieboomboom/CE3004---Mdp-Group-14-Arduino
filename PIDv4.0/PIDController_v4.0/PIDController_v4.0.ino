@@ -29,7 +29,7 @@ char c; //var to hold command sent via Serial.
 bool PIDcontrollerFlag = false; // by default, PID is not called.
 
 DualVNH5019MotorShield md;
-PID PIDControl(&currentTick1, &speed1, &currentTick2, 45 ,0.05 ,0.8, DIRECT);
+PID PIDControl(&currentTick1, &speed1, &currentTick2, 25 ,5,0, DIRECT);
 /*
  * =================================================
  * PID Theory:
@@ -60,7 +60,7 @@ void setup() {
 }
 
 void loop() {
-   moveForward(100);
+   moveForward(30);
    delay(1000);
    
 }
@@ -103,6 +103,7 @@ void moveForward(double distance_cm){
   //Calculate the amount of motor ticks needed to reach the distance
    double target_tick = distanceToTicks(distance_cm);
    double tick_travelled = 0;
+   bool yes;
    
    if(target_tick<0) return;
 
@@ -138,8 +139,8 @@ void moveForward(double distance_cm){
     Serial.print(currentTick1); //for debug
     Serial.print(" "); Serial.println(currentTick2);
     
-    bool yes = PIDControl.Compute(); //return 1 if PID compute something, else will return 0;
-    
+    yes = PIDControl.Compute(); //return 1 if PID compute something, else will return 0;
+    speed1 = max(speed1, 215);
     md.setSpeeds(speed1, speed2); //adjusting speed based on computed PID (PID compute new speed1)
     
     oldTick2 += currentTick2; //update ticks
@@ -149,12 +150,12 @@ void moveForward(double distance_cm){
     //oldTick1 = tick1;
    }
    //gradual breaking once destination is reached to preven jerking
-   md.setBrakes(80,100);
-   delay(5);
-   md.setBrakes(180,200);
-   delay(5);
-   md.setBrakes(380,400);
-   delay(5);
+   md.setBrakes(100,100);
+   delay(2.5);
+   md.setBrakes(200,200);
+   delay(2.5);
+   md.setBrakes(400,400);
+   delay(2.5);
    
 }
 
