@@ -5,8 +5,10 @@ DualVNH5019MotorShield md;
 #define sampleFrom  125
 #define sampleTo    375
 
-int encoderA = 3; //3 for motor 1, 11 for motor 2
-int encoderB = 5; //5 for motor 1, 13 for motor 2
+int encoder1A = 3; //3 for motor 1, 11 for motor 2
+int encoder1B = 5; //5 for motor 1, 13 for motor 2
+int encoder2A = 11;
+int encoder2B = 13;
 unsigned long timing = 0;
 int sample = sampleSize;
 int i = -400;
@@ -16,25 +18,21 @@ boolean collectData = true;
 void setup() {
   // put your setup code here, to run once:
   md.init();
-  pinMode(encoderA, INPUT);
-  pinMode(encoderB, INPUT);
+  pinMode(encoder1A, INPUT);
+  pinMode(encoder1B, INPUT);
+  pinMode(encoder2A, INPUT);
+  pinMode(encoder2B, INPUT);
   Serial.begin(9600);
+  Serial.println("PWM set: -400");
   
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-//  md.setM2Speed(400);
-//  timingA = pulseIn(encoderA, HIGH);
-//  //timingB = pulseIn(encoderB, HIGH);
-//  Serial.println(timingA);
-//  delay(4000);
-//  md.setM2Speed(0);
 while (collectData){
-  md.setM1Speed(i);
+  md.setM2Speed(i); //change
   if(sample>1){
     noInterrupts();
-    timing = pulseIn(encoderB, HIGH, 50000UL);
+    timing = pulseIn(encoder2A, HIGH, 10000UL); //change
     interrupts();
 
     //timingB = pulseIn(encoderA, HIGH);
@@ -51,7 +49,7 @@ while (collectData){
     }
     else{
       Serial.println("Done!");
-      md.setM1Speed(0); 
+      md.setM2Speed(0); //change
       collectData = false;
     }
   }
