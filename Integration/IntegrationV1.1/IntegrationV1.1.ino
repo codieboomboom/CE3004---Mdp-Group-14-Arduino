@@ -1,5 +1,5 @@
 /*
- * Version: 1.0
+ * Version: 1.1
  * 
  * Description:
  * This code is part of the MDP 2019 done by group 14. 
@@ -12,6 +12,9 @@
  * 1. Serial buffer and serial communication to interact with RPI. Data to be sent back to RPI are pending on RPI, Android and Algo team.
  * 2. Calibration using front sensors when reaching a wall // object
  * 3. Accurate & deterministic straight line motion, rotation and simple object avoidance.
+ *  3.1. Moving straight 2x2 grid in 1-6 blocks without much deviation. Discrete motion only (not continous yet)
+ *  3.2. Rotate Left and Right exactly by 90 degree.
+ *  3.3. Motor Characteristic calibrated.
  * 4. Attempt of having 2 operating mode for robot FAST and NORMAL.
  * 
  */
