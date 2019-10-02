@@ -1,4 +1,4 @@
-Serial Buffer for communication from RPi to Arduino is 50 characters string. 
+Serial Buffer for communication from RPi to Arduino is 50 characters string. A delay of 2ms is needed per character in a string as serial might be very slow.  
 
 The commands for controlling the robot are:
 
@@ -16,5 +16,6 @@ The commands for controlling the robot are:
 	'D' or 'd'
 
 	e.g. AAAA means robot rotate right total of 360 degree, relatively on the spot.
+
 
 
