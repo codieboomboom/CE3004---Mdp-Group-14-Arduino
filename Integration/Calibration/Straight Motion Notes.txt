@@ -1,0 +1,9 @@
+Calibrate 2 things:
+-Straight motion of motors (with or without PID)
+	Obtain motors characteristic equations
+	Calibrate based on voltage 6.20-6.29V
+	Results:
+		Slow: 73-70 
+		Fast: 93-90
+-Exact distance travelled
+	Obtain a linear equation by trial and error target tick values

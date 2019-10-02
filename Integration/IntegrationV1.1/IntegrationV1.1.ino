@@ -1,5 +1,5 @@
 /*
- * Version: 1.1
+ * Version: 1.15
  * 
  * Description:
  * This code is part of the MDP 2019 done by group 14. 
@@ -10,6 +10,7 @@
  * 
  * Features:
  * 1. Serial buffer and serial communication to interact with RPI. Data to be sent back to RPI are pending on RPI, Android and Algo team.
+ *  1.1. Template for serial communication done, can tolerate a string of 50 characters
  * 2. Calibration using front sensors when reaching a wall // object
  * 3. Accurate & deterministic straight line motion, rotation and simple object avoidance.
  *  3.1. Moving straight 2x2 grid in 1-6 blocks without much deviation. Discrete motion only (not continous yet)
@@ -76,7 +77,7 @@ SharpIR ps5_long(SharpIR:: GP2Y0A02YK0F, A4);
 SharpIR ps6_short_Back_Right(SharpIR:: GP2Y0A21YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 0 ,0 ,0, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 1.3 ,0.1 ,0, DIRECT);
 PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 0, 0, 0, DIRECT);
 PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 0, 0, 0, DIRECT);
 
@@ -101,11 +102,15 @@ void setup() {
 
   //init values
   currentTick1 = currentTick2 = oldTick1 = oldTick2 = 0;
-  move_forward(1);
+  //move_forward(1);
 }
 
 void loop() {
   get_command();
+  //Debug to see all commands collected.
+//  if(DEBUG){
+//    print_all_commands();
+//  }
   count=0;
   while (command[count] != '\0'){
     //while not end of string
@@ -113,7 +118,8 @@ void loop() {
       case 'W':
       case 'w':
         //move the robot forward with stipulated distance unit (blocks)
-        switch(command[count+1]){//check how many blocks to move
+        switch(command[count+1]){
+          //check how many blocks to move
           case '0':
           case '1':
           case '2':
@@ -129,7 +135,8 @@ void loop() {
               Serial.print(command[count+1]);
               Serial.println(" units"); 
             }
-            move_forward(command[count+1]); //moving forward by amount stipulated.
+            move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
+            //offset -48 is to convert ASCII to blocks distance (cuz 0 = 48 for ascii decimal and so on so forth)
             break;
             
           default: 
@@ -138,7 +145,8 @@ void loop() {
                 Serial.println(command[count]); 
              }
              break;
-            };
+             
+            }
         count++;
         break;
         
@@ -146,14 +154,14 @@ void loop() {
       case 'a':
         //rotate robot to the left 90 degrees
         if (DEBUG){Serial.println("Rotating Left by 90 degrees");}
-        rotate_left();
+        rotate_left(90);
         break;
         
       case 'D':
       case 'd':
         //rotate robot to the right 90 degrees
         if (DEBUG){Serial.println("Rotating Right by 90 degrees");}
-        rotate_right();
+        rotate_right(90);
         break;
       
       default: //by default means error command
@@ -166,7 +174,6 @@ void loop() {
     count++;
   }
   command[0] = '\0';
-
 }
 
 /*
@@ -177,7 +184,7 @@ void loop() {
  */
 
  //A method to rotate robot to the right by a degree. Using 360 degree as a base line
-void rotate_right()
+void rotate_right(double degree)
 {
   double target_tick = 0; 
   target_tick = 390;
@@ -214,15 +221,15 @@ void rotate_right()
   }
 
      for (int i = 0; i <= 400; i+=100){
-     md.setBrakes(i-5,i+5);
+     md.setBrakes(i,i);
      delay(2.5); 
    }
    PIDControlLeft.SetMode(MANUAL);
-  
+   delay(100);
 }
 
 //A method to rotate robot to the left by a degree. Using 360 degree as a base line
-void rotate_left()
+void rotate_left(double degree)
 {
   double target_tick = 0;
   target_tick = 395; //rotate 90 degree 
@@ -265,14 +272,17 @@ void rotate_left()
      delay(2.5); 
    }
    PIDControlRight.SetMode(MANUAL); //turn off PID
-  
+   delay(100);
 }
 
 //A method to move robot forward by distance/unit of square
 void move_forward(double distance){
   //at 6.10v to 6.20v
-   double target_tick = 1840; //calibrate by set a random value and measure actual distance
+   double target_tick = 0; 
+   //calibrate by set a random value and measure actual distance
    //295 = 1 block, 600 = 2 blocks,910 = 3 blocks,1217 = 4 blocks, 1524 = 5 blocks, 1840 = 6 blocks  
+   Serial.println(distance);
+   target_tick = 308.69*distance - 19.067;
    double tick_travelled = 0;
    Serial.print("Target: ");
    Serial.println(target_tick);
@@ -284,15 +294,15 @@ void move_forward(double distance){
    oldTick1 = oldTick2 = 0;
 
    //Speed in rpm for motor 1 and 2
-   speed1 = rpm_to_speed_1(73);
-   speed2 = rpm_to_speed_2(70);
+   speed1 = rpm_to_speed_1(70.75);
+   speed2 = rpm_to_speed_2(70.5);
    Serial.println("Speed:");
    Serial.print(speed1);Serial.print(" ");
    Serial.println(speed2);
 
    //Implementing gradual acceleration to remove jerks
    for (int j = 0; j < speed2; j+=50){
-     md.setSpeeds(j,j);
+     md.setSpeeds(j+5,j-2.5);
      delay(5); 
    }
 
@@ -324,6 +334,7 @@ void move_forward(double distance){
      delay(2.5); 
    }
    PIDControlStraight.SetMode(MANUAL);
+   delay(100);
 }
 
 /*
@@ -386,12 +397,6 @@ double rpm_to_speed_2(double RPM){
  * ======================================================
  */
 
-//calculate length of string received from RPI/Android
-int strlen(String text){
-  int i = 0;
-  while(text[i] != '\0') i++;
-  return i;
-}
 
 //method to get command string into the buffer
 void get_command(){
@@ -399,8 +404,8 @@ void get_command(){
     while(Serial.available()>0){
        command[i] = Serial.read();
        i++;
-       delay(1); //essential delay cause of serial being too slow
-    };
+       delay(2); //essential delay cause of serial being too slow
+    }
     command[i] = '\0';
 
     //Debug print command
@@ -408,6 +413,18 @@ void get_command(){
         Serial.print("COMMAND :");
         Serial.println(command);
     }
+}
+
+//method to print all characters of string received
+void print_all_commands(){
+  int i = 0;
+  Serial.println("Msg Received: ");
+  while (command[i] != '\0'){
+    Serial.print(command[i]);
+    i++;
+  }
+  Serial.print("EndOfLine");
+  Serial.println();
 }
 
 /*

@@ -1,0 +1,20 @@
+Serial Buffer for communication from RPi to Arduino is 50 characters string. 
+
+The commands for controlling the robot are:
+
+1. Moving straight:
+	'W' or 'w', followed by the distance to move in block/square unit. A 3x3 grids has 9 blocks in it, 3 	rows and 3 columns.
+
+	e.g. W1W2W3 means move straight 1 blocks, delay, 2 blocks delay and then 3 blocks, delay. Delay can 	be configure at the end of the move_forward(double unit) methods.
+
+2. Rotate left by 90 deg:
+	'A' or 'a'
+
+	e.g. DDDD means robot rotate left total of 360 degree, relatively on the spot.
+
+3. Rotate right by 90 deg:
+	'D' or 'd'
+
+	e.g. AAAA means robot rotate right total of 360 degree, relatively on the spot.
+
+
