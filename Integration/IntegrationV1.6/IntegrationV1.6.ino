@@ -77,23 +77,18 @@ bool DEBUG = true;
 bool CALIBRATE = true;
 
 //For sensors
-#define SAMPLE 40
-#define front_center A0
-#define front left A1
-#define front right A2
-#define right_front A3
-#define right_back A4
-#define long_left A5
+#define SAMPLE 30
 volatile double sensor_reading[SAMPLE]; //for median filtering
+volatile double sensor_distance_cm[6] = {}; //to hold cm distance and save space
 
 //constructors
 DualVNH5019MotorShield md;
-//SharpIR front_center(SharpIR:: GP2Y0A21YK0F, A0);
-//SharpIR front_left(SharpIR:: GP2Y0A21YK0F, A1);
-//SharpIR front_right(SharpIR:: GP2Y0A21YK0F, A2);
-//SharpIR top_right(SharpIR:: GP2Y0A21YK0F, A3);
-//SharpIR bottom_right(SharpIR:: GP2Y0A21YK0F, A4);
-//SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
+SharpIR front_center(SharpIR:: GP2Y0A21YK0F, A0);
+SharpIR front_left(SharpIR:: GP2Y0A21YK0F, A1);
+SharpIR front_right(SharpIR:: GP2Y0A21YK0F, A2);
+SharpIR right_front(SharpIR:: GP2Y0A21YK0F, A3);
+SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
+SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
 PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 1.3 ,0.1 ,0, DIRECT);
@@ -122,11 +117,11 @@ void setup() {
   //init values
   currentTick1 = currentTick2 = oldTick1 = oldTick2 = 0;
   //rotate_left(1);
-
-  for (int j = 0; j < 10; j--){
-    sensor_calibrate();
-    delay(50); //try if delay time affect reading.
-  }
+//  while(true){
+//    int blocks = distance_short_front_center(true);
+//    Serial.println(blocks);
+//    delay(50);
+//  }
 }
 
 void loop() {
@@ -160,6 +155,10 @@ void loop() {
               Serial.println(" units"); 
             }
             move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
+            for (int i = 0; i< command[count+1]-48; i++){
+              //Serial.println(i);
+              Serial.println("MC");
+            }
             //offset -48 is to convert ASCII to blocks distance (cuz 0 = 48 for ascii decimal and so on so forth)
             break;
             
@@ -179,6 +178,7 @@ void loop() {
         //rotate robot to the left 90 degrees
         if (DEBUG){Serial.println("Rotating Left by 90 degrees");}
         rotate_left(90);
+        Serial.println("MC");
         break;
         
       case 'D':
@@ -186,6 +186,23 @@ void loop() {
         //rotate robot to the right 90 degrees
         if (DEBUG){Serial.println("Rotating Right by 90 degrees");}
         rotate_right(90);
+        Serial.println("MC");
+        break;
+
+      case 'H':
+      case 'h':
+        //calibrate to right wall hug
+        if (DEBUG){Serial.println("Right Wall Calibration");}
+        right_wall_calibrate();
+        Serial.println("CC");
+        break;
+
+      case 'E':
+      case 'e':
+        if (DEBUG){
+          Serial.println("Ending and Realigning");
+        }
+        Serial.println("EC");
         break;
       
       default: //by default means error command
@@ -211,7 +228,8 @@ void loop() {
 void rotate_right(double degree)
 {
   double target_tick = 0; 
-  target_tick =  0.2319*degree + 6.4492;
+  target_tick =4.3589*degree - 32.142; 
+  //0.2319*degree + 6.4492;
   double tick_travelled = 0;
   if (target_tick<0) return;
   
@@ -234,8 +252,9 @@ void rotate_right(double degree)
       currentTick1 = tick1 - oldTick1; //calculate the ticks travelled in this sample interval of 50ms
       currentTick2 = tick2 - oldTick2;
 
-      Serial.print(currentTick1); //for debug
-      Serial.print(" "); Serial.println(currentTick2);
+      //Serial.print(currentTick1); //for debug
+      //Serial.print(" "); Serial.println(currentTick2);
+      
       PIDControlLeft.Compute();
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
@@ -249,14 +268,14 @@ void rotate_right(double degree)
      delay(2.5); 
    }
    PIDControlLeft.SetMode(MANUAL);
-   delay(100);
+   //delay(100);
 }
 
 //A method to rotate robot to the left by a degree. Using 360 degree as a base line
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 0.2267*degree + 4.6766;
+  target_tick = 4.1533*degree; 
   double tick_travelled = 0;
   if (target_tick<0) return;
   
@@ -281,8 +300,8 @@ void rotate_left(double degree)
       currentTick1 = tick1 - oldTick1; //calculate the ticks travelled in this sample interval of 50ms
       currentTick2 = tick2 - oldTick2;
 
-      Serial.print(currentTick1); //for debug
-      Serial.print(" "); Serial.println(currentTick2);
+      //Serial.print(currentTick1); //for debug
+      //Serial.print(" "); Serial.println(currentTick2);
       PIDControlRight.Compute();
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
@@ -296,7 +315,7 @@ void rotate_left(double degree)
      delay(2.5); 
    }
    PIDControlRight.SetMode(MANUAL); //turn off PID
-   delay(100);
+   //delay(100);
 }
 
 //A method to move robot forward by distance/unit of square
@@ -305,11 +324,15 @@ void move_forward(double distance){
    double target_tick = 0; 
    //calibrate by set a random value and measure actual distance
    //295 = 1 block, 600 = 2 blocks,910 = 3 blocks,1217 = 4 blocks, 1524 = 5 blocks, 1840 = 6 blocks  
-   Serial.println(distance);
+   //Serial.println(distance); //debug
    target_tick = 308.69*distance - 19.067;
    double tick_travelled = 0;
-   Serial.print("Target: ");
-   Serial.println(target_tick);
+   
+//   if(DEBUG){
+//   Serial.print("Target: ");
+//   Serial.println(target_tick);
+//   }
+
    if(target_tick<0) return;
 
    // Init values
@@ -320,9 +343,10 @@ void move_forward(double distance){
    //Speed in rpm for motor 1 and 2
    speed1 = rpm_to_speed_1(70.75);
    speed2 = rpm_to_speed_2(70.5);
-   Serial.println("Speed:");
-   Serial.print(speed1);Serial.print(" ");
-   Serial.println(speed2);
+   
+//   Serial.println("Speed:");//for debug
+//   Serial.print(speed1);Serial.print(" ");
+//   Serial.println(speed2);
 
    //Implementing gradual acceleration to remove jerks
    for (int j = 0; j < speed2; j+=50){
@@ -342,8 +366,8 @@ void move_forward(double distance){
       currentTick1 = tick1 - oldTick1; //calculate the ticks travelled in this sample interval of 50ms
       currentTick2 = tick2 - oldTick2;
       
-      Serial.print(currentTick1); //for debug
-      Serial.print(" "); Serial.println(currentTick2);
+//      Serial.print(currentTick1); //for debug
+//      Serial.print(" "); Serial.println(currentTick2);
       PIDControlStraight.Compute();
 
       oldTick2 += currentTick2; //update ticks
@@ -358,7 +382,7 @@ void move_forward(double distance){
      delay(2.5); 
    }
    PIDControlStraight.SetMode(MANUAL);
-   delay(100);
+   //delay(100);
 }
 
 /*
@@ -369,85 +393,117 @@ void move_forward(double distance){
  */
 
  //Methods to return blocks unit from obstacles ++++++++++++
-//int distance_obstacle_front_left(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += front_left.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-//  
-//  return distance_block;
-// }
-//
-//int distance_obstacle_front_right(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += front_right.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-//
-//  return distance_block;
-// }
-//
-//int distance_obstacle_front_center(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += front_center.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-// }
-//
-//int distance_obstacle_right_front(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += top_right.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-// }
-//
-//int distance_obstacle_right_back(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += bottom_right.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-// }
-//
-//int distance_obstacle_left_long(){
-//  double sum = 0;
-//  double distance_cm;
-//  double distance_block;
-//
-//  for (int i = SAMPLE; i > 0; i--){
-//    sum += long_left.getDistance();
-//  }
-//  distance_cm = sum/SAMPLE;
-// }
+int distance_short_front_center(){
+  int distance_cm = 0;
+  for(int i=SAMPLE; i>0; i--){
+      sensor_reading[i] = front_center.getDistance(false);
+      //delay(1);
+    }
+  sortArray(sensor_reading,SAMPLE);
+    
+  //  sensor_distance_cm[0] = sensor_reading[SAMPLE/2];
+  //  Serial.println(sensor_distance_cm[0]);
+  
+  distance_cm = sensor_reading[SAMPLE/2];
 
-//method to aid in calibrating sensors to obtain characteristic of sensor
-void sensor_calibrate() {
-for(int i=SAMPLE; i>0; i--){
-    sensor_reading[i] = analogRead(front_center); //change sensor to be read
-  }
-sortArray(sensor_reading,SAMPLE);
-Serial.print("Analog Reading: "); Serial.println(sensor_reading[SAMPLE/2]);
+  return distance_cm;
+  
+
 
 }
+
+
+int distance_short_front_left(){
+  int distance_cm = 0;
+  int distance_blocks = 0;
+  for(int i=SAMPLE; i>0; i--){
+      sensor_reading[i] = front_left.getDistance(false);
+      //delay(1);
+    }
+  sortArray(sensor_reading,SAMPLE);
+//  sensor_distance_cm[1] = sensor_reading[SAMPLE/2];
+//  if (DEBUG)
+//  Serial.println(sensor_distance_cm[1]);
+
+  distance_cm = sensor_reading[SAMPLE/2];
+  return distance_cm;
+    
+}
+
+int distance_short_front_right(){
+  int distance_cm = 0;
+  int distance_blocks = 0;
+  
+  for(int i=SAMPLE; i>0; i--){
+    sensor_reading[i] = front_right.getDistance(false);
+    //delay(1);
+  }
+  sortArray(sensor_reading,SAMPLE);
+
+  //sensor_distance_cm[2] = sensor_reading[SAMPLE/2];
+  //if (DEBUG)
+  //Serial.println(sensor_distance_cm[2]);
+
+  distance_cm = sensor_reading[SAMPLE/2];
+  return distance_cm;
+}
+
+int distance_short_right_front(){
+  for(int i=SAMPLE; i>0; i--){
+    sensor_reading[i] = right_front.getDistance(false);
+    //delay(1);
+  }
+  sortArray(sensor_reading,SAMPLE);
+
+  //sensor_distance_cm[3] = sensor_reading[SAMPLE/2];
+  distance_cm = sensor_reading[SAMPLE/2];
+  return distance_cm;
+   
+}
+
+int distance_short_right_back(){
+  for(int i=SAMPLE; i>0; i--){
+    sensor_reading[i] = right_back.getDistance(false);
+    //delay(1);
+  }
+  sortArray(sensor_reading,SAMPLE);
+
+//  sensor_distance_cm[4] = sensor_reading[SAMPLE/2];
+//
+//  if (DEBUG)
+//  Serial.println(sensor_distance_cm[4]);
+
+  distance_cm = sensor_reading[SAMPLE/2];
+  return distance_cm;
+}
+
+int distance_long_left(){
+  for(int i=SAMPLE; i>0; i--){
+    sensor_reading[i] = long_left.getDistance(false);
+    //delay(1);
+  }
+  sortArray(sensor_reading,SAMPLE);
+
+//  sensor_distance_cm[5] = sensor_reading[SAMPLE/2];
+//
+//  if (DEBUG)
+//  Serial.println(sensor_distance_cm[5]);
+
+  distance_cm = sensor_reading[SAMPLE/2];
+  return distance_cm;
+}
+
+
+
+//method to aid in calibrating sensors to obtain characteristic of sensor
+//void sensor_calibrate() {
+//for(int i=SAMPLE; i>0; i--){
+//    sensor_reading[i] = analogRead(front_center); //change sensor to be read
+//  }
+//sortArray(sensor_reading,SAMPLE);
+//Serial.print("Analog Reading: "); Serial.println(sensor_reading[SAMPLE/2]);
+//
+//}
 //+++++++++++++++++++++++++++++++++++++++++
 
 //Methods for detect object in front of sensors, for clearance purpose ++++++++++++++++++++++++++++
@@ -462,71 +518,45 @@ Serial.print("Analog Reading: "); Serial.println(sensor_reading[SAMPLE/2]);
 
 //Method for right wall alignment
 void right_wall_calibrate(){
-  if(DEBUG) Serial.println("Right Wall calibrating now!");
-  
   int i = 0;
-  volatile double distance_right_front;
-  volatile double distance_right_back;
-  
-  while (i<80) {
-      distance_right_front = short_distance(analogRead(right_front));
-      distance_right_back = (short_distance(analogRead(right_back)-0.2));
-      if(distance_right_front>33) distance_right_front = 33;
-      if(distance_right_back>33) distance_right_back = 33;
-      if(distance_right_front<0) distance_right_front = 0;
-      if(distance_right_back<0) distance_right_back = 0;
-      i++;
-      delay(10);  
-      if(distance_right_back>distance_right_front){
+  int sum_front = 0;
+  int sum_back = 0;
+  double distance_front;
+  double distance_back;
+  //if have no obstacle (no wall to hug) return
+  //if have to hug then
+
+  while (i<80){
+    distance_front = distance_short_right_front(); //
+    distance_back =  distance_short_right_back(); //
+    i++;
+    delay(30);  
+      if(distance_front>distance_back){
 //        Serial.println("Turn clock");
-        if((distance_right_back-distance_right_front)>0.05){
-//          Serial.print("LEFT");
-          md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
-          delay((distance_right_back-distance_right_front)*7);
+        if((distance_front-distance_back)>0){
+//          Serial.print("RIGHT");
+          md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
+          delay((distance_front-distance_back)*0.1);
+          //delay(0.5);
         }
       }
-      else if(distance_right_front>distance_right_back){
+      else if(distance_back>distance_front){
 //        Serial.println("Turn anti-clock");
-        if((distance_right_front-distance_right_back)>0.05){
-          md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
-          delay((distance_right_front-distance_right_back)*7);
+        if((distance_back-distance_front)>0){
+          md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
+          delay((distance_back-distance_front)*0.1);
+          //delay(1);
         }
     }
+      //Serial.println(i);
     if(DEBUG){
-      Serial.print(distance_right_front);
+      Serial.print(distance_front);
       Serial.print("              |             ");
-      Serial.println(distance_right_back);
-//      Serial.print(ir_valL1);
-//      Serial.print("              |             ");
-//      Serial.println(ir_valL2);
+      Serial.println(distance_back);
+    }
+    md.setBrakes(400,400);
   }
-      md.setBrakes(400,400);
-  }
-//  if(!CALIBRATE){
-//      if(distance_right_front > 11 && distance_right_front != 33){
-//        rotate_left_degree(90);
-////        Serial.println((distance_right_front-10)/10);
-//        go_straight((distance_right_front-10)/10);
-//        delay(100);
-//        rotate_right_degree(180);
-//        md.setBrakes(400,400);
-//        delay(20);
-//        calibrate();
-//        return;
-//      }
-//      if(distance_right_front < 9 && distance_right_front != 33){
-//        rotate_right_degree(90);
-//        go_straight((9.5-distance_right_front)/10);
-//        delay(100);
-//        md.setBrakes(400,400);
-//        delay(20);
-//        calibrate();
-//        return;
-//      }
-//      rotate_right_degree(90);
-//      calibrate();
-//      return;
-//  }
+  
 }
 
 //method to turn and realign when robot at corner or face obstacle
