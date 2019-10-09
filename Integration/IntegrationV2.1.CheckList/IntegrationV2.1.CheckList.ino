@@ -91,9 +91,9 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 1.3 ,0.1 ,0, DIRECT);
-PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 0, 0, 0, DIRECT);
-PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 0, 0, 0, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 0 ,0 ,0, DIRECT);
+PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
+PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 
 /*
  * ==============================
@@ -118,61 +118,33 @@ void setup() {
   //init values
   currentTick1 = currentTick2 = oldTick1 = oldTick2 = 0;
   //rotate_left(1);
-  while(true){
-    int left, right, rf, rb;
-  for(int i=SAMPLE; i>0; i--){
-    sensor_reading[i] = front_left.getDistance(false);
-    delay(1);
-  }
-   for(int i=SAMPLE; i>0; i--){
-    sensor_reading[i] = front_left.getDistance(true);
-    delay(1);
-  }
-  sortArray(sensor_reading,SAMPLE);
-  left = sensor_reading[SAMPLE/2];
-  
-  for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = front_right.getDistance(false);
-  delay(1);
-}
- for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = front_right.getDistance(true);
-  delay(1);
-}
-  sortArray(sensor_reading,SAMPLE);
-  right = sensor_reading[SAMPLE/2];
-
-    for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = right_front.getDistance(false);
-  delay(1);
-}
- for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = right_front.getDistance(true);
-  delay(1);
-}
-  sortArray(sensor_reading,SAMPLE);
-  rf = sensor_reading[SAMPLE/2];
-
-    for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = right_back.getDistance(false);
-  delay(1);
-}
- for(int i=SAMPLE; i>0; i--){
-  sensor_reading[i] = right_back.getDistance(true);
-  delay(1);
-}
-  sortArray(sensor_reading,SAMPLE);
-  rb = sensor_reading[SAMPLE/2];
-  
-  Serial.print(left);
-  Serial.print("|");
-  Serial.print(right);
-  Serial.print("|");
-  Serial.print(rf);
-  Serial.print("|");
-  Serial.println(rb);
-  
-  }
+//  while (true){
+//    move_forward(1);
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    right_wall_calibrate();
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    rotate_right(90);
+//    delay(50);
+//    front_calibrate();
+//    delay(50);
+//    rotate_right(90);
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    move_forward(1);
+//    delay(50);
+//    move_forward(1);
+//
+//    
+//  }
 }
 
 void loop() {
@@ -205,11 +177,15 @@ void loop() {
               Serial.print(command[count+1]);
               Serial.println(" units"); 
             }
-            move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
+            //move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
 //            for (int i = 0; i< command[count+1]-48; i++){
 //              //Serial.println(i);
 //              Serial.println("MC");
 //            }
+            for (int k = command[count+1]-48; k > 0; k --){
+              //Serial.print(k);
+              move_forward(1); //moving forward by amount stipulcated.
+            }
             //offset -48 is to convert ASCII to blocks distance (cuz 0 = 48 for ascii decimal and so on so forth)
             break;
             
@@ -292,7 +268,8 @@ void loop() {
 void rotate_right(double degree)
 {
   double target_tick = 0; 
-  target_tick =4.3589*degree - 32.142; 
+  //target_tick =4.3589*degree - 32.142;
+  target_tick = 400;
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
   if (target_tick<0) return;
@@ -327,9 +304,9 @@ void rotate_right(double degree)
       //oldTick1 = tick1;
   }
 
-     for (int i = 0; i <= 400; i+=100){
+     for (int i = 0; i <= 400; i+=200){
      md.setBrakes(i,i);
-     delay(2.5); 
+     delay(1); 
    }
    PIDControlLeft.SetMode(MANUAL);
    //delay(100);
@@ -339,7 +316,8 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 4.1533*degree; 
+  target_tick = 400;
+  //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
 
   if (target_tick<0) return;
@@ -375,9 +353,9 @@ void rotate_left(double degree)
       //oldTick1 = tick1;
   }
 
-     for (int i = 0; i <= 400; i+=100){
-     md.setBrakes(i-5,i+5);
-     delay(2.5); 
+     for (int i = 0; i <= 400; i+=200){
+     md.setBrakes(i,i);
+     delay(1); 
    }
    PIDControlRight.SetMode(MANUAL); //turn off PID
    //delay(100);
@@ -415,7 +393,7 @@ void move_forward(double distance){
 
    //Implementing gradual acceleration to remove jerks
    for (int j = 0; j < speed2; j+=50){
-     md.setSpeeds(j+5,j-2.5);
+     md.setSpeeds(j,j-2.5);
      delay(5); 
    }
 
@@ -440,10 +418,10 @@ void move_forward(double distance){
       tick_travelled += currentTick2;
       //oldTick2 = tick2;
       //oldTick1 = tick1;
-      if (int(tick_travelled) == 300 || int(tick_travelled) == 600 || int(tick_travelled) == 900 ||int(tick_travelled) == 1200 ||int(tick_travelled) == 1500 || int(tick_travelled) == 1800 ||int(tick_travelled) == 2100 || int(tick_travelled) == 2400 || int(tick_travelled) == 2700)
-        Serial.println(tick_travelled);
-        Serial.println("MC");
-        delay(10);
+//      if (int(tick_travelled) == 300 || int(tick_travelled) == 600 || int(tick_travelled) == 900 ||int(tick_travelled) == 1200 ||int(tick_travelled) == 1500 || int(tick_travelled) == 1800 ||int(tick_travelled) == 2100 || int(tick_travelled) == 2400 || int(tick_travelled) == 2700)
+//        Serial.println(tick_travelled);
+//        Serial.println("MC");
+//        delay(10);
       
    }
    
@@ -453,7 +431,7 @@ void move_forward(double distance){
    }
    PIDControlStraight.SetMode(MANUAL);
    Serial.println("MC");
-   delay(100);
+   delay(1);
 }
 
 /*
@@ -481,16 +459,14 @@ int distance_short_front_center(){
   
   distance_cm = sensor_reading[SAMPLE/2];
   if (distance_cm <=12)
-    return 0;
+    return 1;//org 0
   else if (distance_cm <=20)
-    return 1;
+    return 2; //org 1
   else if (distance_cm <= 35)
-    return 2;
+    return 3; //org 2
   else
     return -1;
   
-
-
 }
 
 
@@ -512,13 +488,9 @@ int distance_short_front_left(){
 
   distance_cm = sensor_reading[SAMPLE/2]-3;
   
-  distance_blocks = distance_cm /10.3;
-  if (distance_blocks > 1){
-    if (distance_cm <= 31)
-      return 2;
-    else
-      return -1;
-  }
+  distance_blocks = (distance_cm /10.3)+1;
+  if (distance_blocks > 2)
+    return -1;
   return distance_blocks;
     
 }
@@ -543,13 +515,9 @@ int distance_short_front_right(){
 
   distance_cm = sensor_reading[SAMPLE/2]-3;
   
-  distance_blocks = distance_cm /10.3;
-  if (distance_blocks > 1){
-    if (distance_cm <= 32)
-      return 2;
-    else
-      return -1;
-  }
+  distance_blocks = (distance_cm /10.3)+1;
+  if (distance_blocks > 2) //org larger than 1
+    return -1;
   return distance_blocks;
 }
 
@@ -567,11 +535,9 @@ int distance_short_right_front(){
   //sensor_distance_cm[3] = sensor_reading[SAMPLE/2];
   distance_cm = sensor_reading[SAMPLE/2];
   if (distance_cm <= 15)
-    return 0;
+    return 1; //org 0
   else if (distance_cm <=25)
-    return 1;
-  else if (distance_cm <= 34)
-    return 2;
+    return 2; //org 1
   else
     return -1;
   
@@ -596,11 +562,9 @@ int distance_short_right_back(){
 
   distance_cm = sensor_reading[SAMPLE/2];
   if (distance_cm <= 17)
-    return 0;
+    return 1; //org 0
   else if (distance_cm <=29)
-    return 1;
-  else if (distance_cm <= 36)
-    return 2;
+    return 2; //org 1
   else return -1;
 }
 
@@ -622,15 +586,15 @@ int distance_long_left(){
 
   distance_cm = sensor_reading[SAMPLE/2];
   if (distance_cm <= 19)
-     return 0;
+     return 1; //org 0
   else if (distance_cm <= 25)
-     return 1;
+     return 2; //org 1
   else if (distance_cm <= 34)
-    return 2;
+    return 3; //2 
   else if (distance_cm <= 43)
-    return 3;
+    return 4; //3
   else if (distance_cm <= 53)
-    return 4;
+    return 5; //4
   else
     return -1;
   
@@ -746,8 +710,8 @@ void front_calibrate(){
   double distance_left = 0;
   double distance_right = 0;
   double difference = 0;
-  double ideal = 10;
-  int k = 30;
+  double ideal = 10.9;
+  int k = 15;
   Serial.println("Front calibrating");
   
   while((distance_left != ideal || distance_right != ideal)&& k > 0){
@@ -768,7 +732,7 @@ void front_calibrate(){
     delay(1);
     k--;
 
-    if(abs(difference) <= 0.09){
+    if(abs(difference) <= 0.5){
       Serial.println("Almost straight!");
       if(distance_left > ideal && distance_right > ideal){
       md.setSpeeds(rpm_to_speed_1(15),rpm_to_speed_2(15));
@@ -790,16 +754,16 @@ void front_calibrate(){
           Serial.println("too close");
         }
       }
-      else if (distance_left == ideal && distance_right == ideal)
+      else if (distance_left == ideal || distance_right == ideal)
         break;
    }
     
     else {
       Serial.println("Oof!");
-      k = 10; //kick loop up
-    if(difference>0.09){
+      k = 3; //kick loop up
+    if(difference>0.5){
       //slanted so rotate right
-      md.setSpeeds(rpm_to_speed_1(-10), rpm_to_speed_2(10));
+      md.setSpeeds(rpm_to_speed_1(-15), rpm_to_speed_2(15));
       if (DEBUG)
       {
         Serial.print(distance_left);
@@ -808,9 +772,9 @@ void front_calibrate(){
         Serial.println("slanted to left");
       }
     }
-    else if (difference < -0.09){
+    else if (difference < -0.5){
        //slanted so rotate left
-      md.setSpeeds(rpm_to_speed_1(10), rpm_to_speed_2(-10));
+      md.setSpeeds(rpm_to_speed_1(15), rpm_to_speed_2(-15));
       if (DEBUG)
       {
         Serial.print(distance_left);
@@ -819,7 +783,7 @@ void front_calibrate(){
         Serial.println("slanted to right");
       }
     }
-    delay(15);
+    delay(10);
     md.setBrakes(50,50);
    } 
  }
