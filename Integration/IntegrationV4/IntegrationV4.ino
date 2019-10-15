@@ -66,11 +66,11 @@ int count = 0;
 
 //Operating states
 bool FASTEST_PATH = false;
-bool DEBUG = true;
+bool DEBUG = false;
 bool CALIBRATE = true;
 
 //For sensors
-#define SAMPLE 60
+#define SAMPLE 50
 
 volatile double sensor_reading[SAMPLE]; //for median filtering
 
@@ -173,7 +173,7 @@ void loop() {
               Serial.print(command[count+1]);
               Serial.println(" units"); 
             }
-            delay(5);
+            delay(2.5);
             move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
 //            for (int i = 0; i< command[count+1]-48; i++){
 //              move_forward(1);
@@ -196,7 +196,7 @@ void loop() {
       case 'a':
         //rotate robot to the left 90 degrees
         if (DEBUG){Serial.println("Rotating Left by 90 degrees");}
-        delay(5);
+        delay(2.5);
         rotate_left(90);
         Serial.println("MC");
         break;
@@ -205,7 +205,7 @@ void loop() {
       case 'd':
         //rotate robot to the right 90 degrees
         if (DEBUG){Serial.println("Rotating Right by 90 degrees");}
-        delay(5);
+        delay(2.5);
         rotate_right(90);
         Serial.println("MC");
         break;
@@ -214,7 +214,7 @@ void loop() {
       case 'h':
         //calibrate to right wall hug
         if (DEBUG){Serial.println("Right Wall Calibration");}
-        delay(5);
+        delay(2.5);
         right_wall_calibrate();
         Serial.println("CC");
         break;
@@ -223,14 +223,14 @@ void loop() {
       case 'f':
         //calibrate front
         if (DEBUG){Serial.println("Front Calibrating");}
-        delay(5);
+        delay(2.5);
         front_calibrate();
         Serial.println("CC");
         break;
 
       case 'S':
       case 's':
-        read_all_sensors();
+        read_all_sensors(10);
         break;
 
       case 'E':
@@ -247,7 +247,7 @@ void loop() {
         FASTEST_PATH = true;
         if(DEBUG)
           Serial.println("Get Ready Boiz");
-        delay(1);
+        delay(2.5);
         break;
       
       default: //by default means error command
@@ -275,6 +275,10 @@ void rotate_right(double degree)
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
   target_tick = 380;
+
+  if (FASTEST_PATH){
+    target_tick = 384;
+  }
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
   if (target_tick<0) return;
@@ -290,9 +294,14 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
-  PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
-
+  
+  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
+  if (FASTEST_PATH){
+    PIDControlRight.SetTunings(10,0.1, 1.5);
+    PIDControlRight.SetSampleTime(5);
+  }
+  PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
+  
   while(tick_travelled < target_tick){
       // if not reach destination ticks yet
       currentTick1 = tick1 - oldTick1; //calculate the ticks travelled in this sample interval of 50ms
@@ -301,7 +310,7 @@ void rotate_right(double degree)
       //Serial.print(currentTick1); //for debug
       //Serial.print(" "); Serial.println(currentTick2);
       
-      PIDControlLeft.Compute();
+      PIDControlRight.Compute();
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
@@ -313,7 +322,7 @@ void rotate_right(double degree)
      md.setBrakes(i,i);
      delay(1); 
    }
-   PIDControlLeft.SetMode(MANUAL);
+   PIDControlRight.SetMode(MANUAL);
    delay(5);
 }
 
@@ -322,6 +331,10 @@ void rotate_left(double degree)
 {
   double target_tick = 0;
   target_tick = 395;
+
+  if(FASTEST_PATH){
+    target_tick = 398;
+  }
   //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
 
@@ -340,8 +353,12 @@ void rotate_left(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
-  PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
+  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
+  if (FASTEST_PATH){
+    PIDControlLeft.SetTunings(10,0.1, 1.5);
+    PIDControlLeft.SetSampleTime(5);
+  }
+  PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){
       // if not reach destination ticks yet
@@ -350,7 +367,7 @@ void rotate_left(double degree)
 
       //Serial.print(currentTick1); //for debug
       //Serial.print(" "); Serial.println(currentTick2);
-      PIDControlRight.Compute();
+      PIDControlLeft.Compute();
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
@@ -362,7 +379,7 @@ void rotate_left(double degree)
      md.setBrakes(i,i);
      delay(1); 
    }
-   PIDControlRight.SetMode(MANUAL); //turn off PID
+   PIDControlLeft.SetMode(MANUAL); //turn off PID
    delay(5);
 }
 
@@ -395,13 +412,13 @@ void move_forward(int distance){
       target_tick = 1860;
       break;
     case 7:
-      target_tick = 2487;
+      target_tick = 2170;
       break;
     case 8:
-      target_tick = 2810;
+      target_tick = 2487;
       break;
     case 9:
-      target_tick = 3140;
+      target_tick = 2810;
       break;
     }
    }
@@ -648,8 +665,8 @@ int distance_long_left(){
   
 }
 
-void read_all_sensors(){
-  delay(10);
+void read_all_sensors(int delay_time){
+  delay(delay_time);
   int sensor1,sensor2,sensor3,sensor4,sensor5,sensor6;
   sensor1 = distance_short_front_center();
   sensor2 = distance_short_front_left();
