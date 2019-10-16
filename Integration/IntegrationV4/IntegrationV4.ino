@@ -68,8 +68,8 @@ int count = 0;
 bool FASTEST_PATH = false;
 bool DEBUG = false;
 bool CALIBRATE = true;
-
-//For sensors
+int delayFastestPath = 20;
+//For sensors meian filter
 #define SAMPLE 50
 
 volatile double sensor_reading[SAMPLE]; //for median filtering
@@ -84,7 +84,7 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 8.5 ,0.02 ,0.5, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 
@@ -141,6 +141,9 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //  }
+//move_forward(8);
+//rotate_left(90);
+//move_forward(8);
 }
 
 void loop() {
@@ -173,7 +176,7 @@ void loop() {
               Serial.print(command[count+1]);
               Serial.println(" units"); 
             }
-            delay(2.5);
+            delay(3);
             move_forward(int(command[count+1])-48); //moving forward by amount stipulcated.
 //            for (int i = 0; i< command[count+1]-48; i++){
 //              move_forward(1);
@@ -196,7 +199,7 @@ void loop() {
       case 'a':
         //rotate robot to the left 90 degrees
         if (DEBUG){Serial.println("Rotating Left by 90 degrees");}
-        delay(2.5);
+        delay(3);
         rotate_left(90);
         Serial.println("MC");
         break;
@@ -205,7 +208,7 @@ void loop() {
       case 'd':
         //rotate robot to the right 90 degrees
         if (DEBUG){Serial.println("Rotating Right by 90 degrees");}
-        delay(2.5);
+        delay(3);
         rotate_right(90);
         Serial.println("MC");
         break;
@@ -214,7 +217,7 @@ void loop() {
       case 'h':
         //calibrate to right wall hug
         if (DEBUG){Serial.println("Right Wall Calibration");}
-        delay(2.5);
+        delay(3);
         right_wall_calibrate();
         Serial.println("CC");
         break;
@@ -223,7 +226,7 @@ void loop() {
       case 'f':
         //calibrate front
         if (DEBUG){Serial.println("Front Calibrating");}
-        delay(2.5);
+        delay(3);
         front_calibrate();
         Serial.println("CC");
         break;
@@ -247,7 +250,7 @@ void loop() {
         FASTEST_PATH = true;
         if(DEBUG)
           Serial.println("Get Ready Boiz");
-        delay(2.5);
+        delay(3);
         break;
       
       default: //by default means error command
@@ -295,12 +298,15 @@ void rotate_right(double degree)
   tick_travelled = (double)tick2;
 
   
-  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlRight.SetSampleTime(25); //Controller is called every 25ms
   if (FASTEST_PATH){
-    PIDControlRight.SetTunings(10,0.1, 1.5);
-    PIDControlRight.SetSampleTime(5);
+    PIDControlRight.SetTunings(4,0, 0.01);
+    PIDControlRight.SetSampleTime(15); // less aggressive
   }
   PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
+
+  Serial.println("PID controller right: ");
+  PIDdebug(PIDControlRight);
   
   while(tick_travelled < target_tick){
       // if not reach destination ticks yet
@@ -323,7 +329,13 @@ void rotate_right(double degree)
      delay(1); 
    }
    PIDControlRight.SetMode(MANUAL);
+   
+   Serial.println("PID controller right OFF: ");
+   PIDdebug(PIDControlRight);
+   
    delay(5);
+   if(FASTEST_PATH)
+      delay(delayFastestPath);
 }
 
 //A method to rotate robot to the left by a degree. Using 360 degree as a base line
@@ -333,7 +345,7 @@ void rotate_left(double degree)
   target_tick = 395;
 
   if(FASTEST_PATH){
-    target_tick = 398;
+    target_tick = 390;
   }
   //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
@@ -355,10 +367,14 @@ void rotate_left(double degree)
 
   PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
   if (FASTEST_PATH){
-    PIDControlLeft.SetTunings(10,0.1, 1.5);
-    PIDControlLeft.SetSampleTime(5);
+    PIDControlLeft.SetTunings(5,0, 0.01);
+    PIDControlLeft.SetSampleTime(15);
   }
   PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
+
+  Serial.println("PID controller left: ");
+  PIDdebug(PIDControlLeft);
+  
 
   while(tick_travelled < target_tick){
       // if not reach destination ticks yet
@@ -380,7 +396,11 @@ void rotate_left(double degree)
      delay(1); 
    }
    PIDControlLeft.SetMode(MANUAL); //turn off PID
+   Serial.println("PID controller left OFF: ");
+   PIDdebug(PIDControlLeft);
    delay(5);
+   if(FASTEST_PATH)
+      delay(delayFastestPath);
 }
 
 //A method to move robot forward by distance/unit of square
@@ -388,8 +408,6 @@ void move_forward(int distance){
   //at 6.10v to 6.20v
    double rpm1, rpm2;
    double target_tick = 0; 
-   //calibrate by set a random value and measure actual distance
-   //295 = 1 block, 600 = 2 blocks,910 = 3 blocks,1217 = 4 blocks, 1524 = 5 blocks, 1840 = 6 blocks  
    //Serial.println(distance); //debug
    if(FASTEST_PATH){
     switch(distance){
@@ -442,12 +460,12 @@ void move_forward(int distance){
    //Speed in rpm for motor 1 and 2
    if (FASTEST_PATH)
    {
-    rpm1 = 98.5;
+    rpm1 = 99;
     rpm2 = 100;
    }
    else{
     rpm1 = 82.5;
-    rpm2 = 84;
+    rpm2 = 83;
    }
    speed1 = rpm_to_speed_1(rpm1); //70.75 //74.9  100
    speed2 = rpm_to_speed_2(rpm2); //70.5 //74.5 99.5
@@ -465,11 +483,16 @@ void move_forward(int distance){
    //Set Final ideal speed and accomodate for the ticks we used in acceleration
    md.setSpeeds(speed1,speed2);
    tick_travelled = (double)tick2;
-   PIDControlStraight.SetSampleTime(5); //Controller is called every 50ms
-   PIDControlStraight.SetMode(AUTOMATIC); //Controller is invoked automatically using default value for PID
+   PIDControlStraight.SetSampleTime(25); //Controller is called every 25ms
+
    if(FASTEST_PATH){//turn on PID tuning if fastest path
      PIDControlStraight.SetTunings(11,0.1, 1.5);
+     PIDControlStraight.SetSampleTime(15);
    }
+   PIDControlStraight.SetMode(AUTOMATIC); //Controller is invoked automatically using default value for PID
+   Serial.println("PID controller straight: ");
+   PIDdebug(PIDControlStraight);
+
 
    while(tick_travelled < target_tick){
       // if not reach destination ticks yet
@@ -497,8 +520,12 @@ void move_forward(int distance){
      delay(2.5); 
    }
    PIDControlStraight.SetMode(MANUAL);
+   Serial.println("PID controller straight END: ");
+   PIDdebug(PIDControlStraight);
    Serial.println("MC");
    delay(5);
+   if(FASTEST_PATH)
+      delay(delayFastestPath);
 }
 
 /*
@@ -779,7 +806,7 @@ void right_wall_calibrate(){
       delay(20);
     }
 
-   else if (distance_front > 12.5 || distance_back > 12.5){
+   else if (distance_front > 12 || distance_back > 12){
       rotate_right(90);
       delay(50);
       front_calibrate();
@@ -1061,3 +1088,10 @@ void print_all_commands(){
  * We feedback to the system as PWM speed (speed1) of the unstable motor 1.
  * ===================================================
  */
+ void PIDdebug(PID controller){
+  Serial.println("PID constants (P, I, D): ");
+  Serial.println(controller.GetKp());
+  Serial.println(controller.GetKi());
+  Serial.println(controller.GetKd());
+  Serial.println(controller.GetMode());
+ }

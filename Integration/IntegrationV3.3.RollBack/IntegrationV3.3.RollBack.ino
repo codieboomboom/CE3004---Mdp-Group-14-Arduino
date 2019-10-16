@@ -33,6 +33,17 @@
  * - Turning right slightly more than 90 degree, error adds up
  * - Turning left slightly less than 90 degree, error adds up
  * 
+ * Once stable:
+ * Consider 3.2 competition code where:
+ * PID of turning set to every 25 ms
+ * Make this changes and investigate:
+ * PID of going straight down to 5 ms
+ * PID of turning to 5 ms
+ * FASTEST PATH with PID (distance, speed, slipping) - refer integrationv4 move_forard for fastest path implementation in move_forward
+ * Tricky calibration case for front and right wall
+ * Speed up to 85 RPM (check v4) -explore, with PID
+ * Speed up for FASTEST PATH
+ * 
  */
 
 
@@ -99,7 +110,7 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 2.5 ,0.01 ,0.05, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 0 ,0 ,0, DIRECT);
 PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 
@@ -156,7 +167,6 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //}
-
 }
 
 void loop() {
@@ -290,7 +300,7 @@ void rotate_right(double degree)
 {
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
-  target_tick = 389;
+  target_tick = 390;
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
   if (target_tick<0) return;
@@ -306,7 +316,7 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlLeft.SetSampleTime(50); //Controller is called every 50ms
   PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){
@@ -356,7 +366,7 @@ void rotate_left(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlRight.SetSampleTime(50); //Controller is called every 50ms
   PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){
@@ -412,7 +422,7 @@ void move_forward(double distance){
     rpm2 = 89.8;
    }
    else{
-    rpm1 = 70.7;
+    rpm1 = 70.75;
     rpm2 = 70.5;
    }
    speed1 = rpm_to_speed_1(rpm1); //70.75 //74.9  100
@@ -719,7 +729,7 @@ void right_wall_calibrate(){
     return;
   }
   if (DEBUG) Serial.println("Right Wall distance calibration");
-  for (int i = 10; i>0; i--){
+  for (int k = 10; k>0; k--){
       distance_front += right_front.getDistance(true);
       distance_back += right_back.getDistance(true);
     }
@@ -749,7 +759,7 @@ void right_wall_calibrate(){
   if (DEBUG) Serial.println("Right Wall Angle Calibration");
   while(i > 0){
 
-    for (int i = 10; i>0; i--){
+    for (int k = 10; k>0; k--){
       distance_front += right_front.getDistance(true);
       distance_back += right_back.getDistance(true);
     }

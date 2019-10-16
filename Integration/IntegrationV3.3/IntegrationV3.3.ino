@@ -306,7 +306,7 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlLeft.SetSampleTime(50); //Controller is called every 50ms
   PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){
@@ -356,7 +356,7 @@ void rotate_left(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlRight.SetSampleTime(50); //Controller is called every 50ms
   PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){

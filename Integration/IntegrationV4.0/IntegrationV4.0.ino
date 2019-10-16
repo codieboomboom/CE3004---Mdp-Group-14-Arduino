@@ -99,9 +99,9 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 2.5 ,0.01 ,0.05, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 9 ,0.0 ,0.1, DIRECT);
 PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
-PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
+PID PIDControlRight(&currentTick1, &speed1, &currentTick2, , 3, 0, 0 DIRECT);
 
 /*
  * ==============================
@@ -156,6 +156,12 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //}
+
+while(true){
+right_wall_calibrate();
+rotate_left(90);
+delay(2000);
+}
 
 }
 
@@ -290,7 +296,7 @@ void rotate_right(double degree)
 {
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
-  target_tick = 389;
+  target_tick = 384;
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
   if (target_tick<0) return;
@@ -306,7 +312,7 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlLeft.SetSampleTime(5); //Controller is called every 50ms
   PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){
@@ -337,7 +343,7 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 397;
+  target_tick = 387;
   //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
 
@@ -356,7 +362,7 @@ void rotate_left(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlRight.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlRight.SetSampleTime(5); //Controller is called every 50ms
   PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
 
   while(tick_travelled < target_tick){

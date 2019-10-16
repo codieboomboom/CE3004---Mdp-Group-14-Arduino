@@ -710,7 +710,7 @@ void right_wall_calibrate(){
   double difference = 0;
   double distance_front = 0;
   double distance_back = 0;
-  int i = 60;
+  int i = 70;
 
   //calibrate distance first by front calibrate
   if (!has_obstacle_right_front() || !has_obstacle_right_back()){
