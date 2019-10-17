@@ -892,6 +892,7 @@ void front_calibrate(){
    
   if(DEBUG)
     Serial.println("Front calibrating");
+    
   while (j>0){
     while (k>0 && only_distance_calibrate == false){
       //calibrate in term of angles first
@@ -919,14 +920,14 @@ void front_calibrate(){
       delay(1);
       //calibrate the angle by rotate left/right
       if (difference > 0.03){
-        k++;
+        //k++;
         md.setSpeeds(rpm_to_speed_1(-20),rpm_to_speed_2(20));
         delay(10);
         md.setBrakes(50,50);
       }
   
       else if(difference < -0.03){
-        k++;
+        //k++;
         md.setSpeeds(rpm_to_speed_1(20),rpm_to_speed_2(-20));
         delay(10);
         md.setBrakes(50,50);
@@ -935,6 +936,12 @@ void front_calibrate(){
       else
         break;
     }
+    
+    Serial.print("K: ");
+    Serial.println(k);
+    Serial.print("J: ");
+    Serial.println(j);
+    
     if(DEBUG && only_distance_calibrate == false)
       Serial.println("Done calibrating angle front");
     
@@ -977,7 +984,17 @@ void front_calibrate(){
     }
     j--;
     k=15;
+
+    Serial.print("K: ");
+    Serial.println(k);
+    Serial.print("J: ");
+    Serial.println(j);
   }
+
+  Serial.print("K: ");
+  Serial.println(k);
+  Serial.print("J: ");
+  Serial.println(j);
   if (DEBUG){
     Serial.println("Done front calibration!");
   }
