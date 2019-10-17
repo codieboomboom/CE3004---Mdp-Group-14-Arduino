@@ -141,9 +141,7 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //  }
-//move_forward(8);
-//rotate_left(90);
-//move_forward(8);
+//TestFastest();
 }
 
 void loop() {
@@ -158,7 +156,7 @@ void loop() {
     switch(command[count]){
       case 'W':
       case 'w':
-        //move the robot forward with stipulated distance unit (blocks)
+        //move robot forward with stipulated distance unit (blocks)
         switch(command[count+1]){
           //check how many blocks to move
           case '0':
@@ -280,7 +278,7 @@ void rotate_right(double degree)
   target_tick = 380;
 
   if (FASTEST_PATH){
-    target_tick = 384;
+    target_tick = 394;
   }
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
@@ -460,11 +458,11 @@ void move_forward(int distance){
    //Speed in rpm for motor 1 and 2
    if (FASTEST_PATH)
    {
-    rpm1 = 99;
+    rpm1 = 98.7;
     rpm2 = 100;
    }
    else{
-    rpm1 = 82.5;
+    rpm1 = 81.7;
     rpm2 = 83;
    }
    speed1 = rpm_to_speed_1(rpm1); //70.75 //74.9  100
@@ -1095,3 +1093,47 @@ void print_all_commands(){
   Serial.println(controller.GetKd());
   Serial.println(controller.GetMode());
  }
+
+void TestExploration(){
+  FASTEST_PATH = false;
+  move_forward(1);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  right_wall_calibrate();
+  rotate_right(90);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  rotate_right(90);
+  delay(90);
+  move_forward(1);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  move_forward(1);
+  delay(500);
+  rotate_left(90);
+  delay(500);
+  rotate_left(90);
+  delay(500);
+  right_wall_calibrate();
+  rotate_right(90);
+  move_forward(1);
+  
+}
+
+void TestFastest(){
+  FASTEST_PATH = true;
+  move_forward(9);
+  rotate_left(90);
+  move_forward(2);
+  rotate_right(90);
+  move_forward(1);
+  rotate_right(90);
+  move_forward(5);
+}
