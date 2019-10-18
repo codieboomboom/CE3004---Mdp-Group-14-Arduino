@@ -84,7 +84,7 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 4, 0, 0.1, DIRECT);
 PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
 
@@ -141,6 +141,7 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //  }
+//TestExploration();
 //TestFastest();
 }
 
@@ -340,7 +341,7 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 395;
+  target_tick = 396;
 
   if(FASTEST_PATH){
     target_tick = 395;
@@ -458,11 +459,11 @@ void move_forward(byte distance){
    //Speed in rpm for motor 1 and 2
    if (FASTEST_PATH)
    {
-    rpm1 = 98.7;
+    rpm1 = 99.4;
     rpm2 = 100;
    }
    else{
-    rpm1 = 81.7;
+    rpm1 = 82.5;
     rpm2 = 83;
    }
    speed1 = rpm_to_speed_1(rpm1); //70.75 //74.9  100
@@ -739,17 +740,17 @@ bool has_obstacle_front_right(){
 }
 
 bool has_obstacle_right_front(){
-  if (distance_short_right_front() != -1)
-    return true;
-  else
+  if (distance_short_right_front() != 1)
     return false;
+  else
+    return true;
 }
 
 bool has_obstacle_right_back(){
-  if (distance_short_right_back() != -1)
-    return true;
-  else
+  if (distance_short_right_back() != 1)
     return false;
+  else
+    return true;
 }
 
 //bool has_obstacle_long_left(){
@@ -780,13 +781,14 @@ void right_wall_calibrate(){
     return;
   }
   else if(!has_obstacle_right_front() || !has_obstacle_right_back()){
-    if (distance_short_right_front() != distance_short_right_back()){
+    if (distance_short_right_front() !=  distance_short_right_back()){
         distance_calibrate_only = true;
         i = 0;
     }
-    Serial.println(distance_calibrate_only);
+    
     
   }
+  Serial.println(distance_calibrate_only);
   if (DEBUG) Serial.println("Right Wall distance calibration");
   for (byte j = 10; j>0; j--){
       distance_front += right_front.getDistance(true);
@@ -1112,46 +1114,4 @@ void print_all_commands(){
   Serial.println(controller.GetMode());
  }
 //
-//void TestExploration(){
-//  FASTEST_PATH = false;
-//  move_forward(1);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  right_wall_calibrate();
-//  rotate_right(90);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  rotate_right(90);
-//  delay(90);
-//  move_forward(1);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  move_forward(1);
-//  delay(500);
-//  rotate_left(90);
-//  delay(500);
-//  rotate_left(90);
-//  delay(500);
-//  right_wall_calibrate();
-//  rotate_right(90);
-//  move_forward(1);
-//  
-//}
-
-void TestFastest(){
-  FASTEST_PATH = true;
-  move_forward(9);
-  rotate_left(90);
-  move_forward(2);
-  rotate_right(90);
-  move_forward(1);
-  rotate_right(90);
-  move_forward(5);
-}
+//U
