@@ -141,8 +141,8 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //  }
-//TestExploration();
-//TestFastest();
+// Fastest();
+// Explore();
 }
 
 void loop() {
@@ -276,7 +276,7 @@ void rotate_right(double degree)
 {
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
-  target_tick = 386;
+  target_tick = 380;
 
   if (FASTEST_PATH){
     target_tick = 394;
@@ -340,10 +340,10 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 396;
+  target_tick = 395;
 
   if(FASTEST_PATH){
-    target_tick = 395;
+    target_tick = 398;
   }
   //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
