@@ -296,7 +296,6 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  
   PIDControlRight.SetSampleTime(25); //Controller is called every 25ms
   if (FASTEST_PATH){
     PIDControlRight.SetTunings(4,0, 0.01);
@@ -845,13 +844,13 @@ void right_wall_calibrate(){
     i--;                                          
     
 
-    if(difference >= 0.03 && distance_back < 25){ //If the robot tilts to the right 
+    if(difference >= 0.05){ //&& distance_back < 25){ //If the robot tilts to the right 
       md.setSpeeds(rpm_to_speed_1(-20),rpm_to_speed_2(20));
       delay(15);
       md.setBrakes(50,50);
     }
     
-    else if(difference <= -0.03 && distance_back  < 25){ //If the robot tilts to the left
+    else if(difference <= -0.05 ){//&& distance_back  < 25){ //If the robot tilts to the left
       md.setSpeeds(rpm_to_speed_1(20),rpm_to_speed_2(-20));
       delay(15);
       md.setBrakes(50,50);
