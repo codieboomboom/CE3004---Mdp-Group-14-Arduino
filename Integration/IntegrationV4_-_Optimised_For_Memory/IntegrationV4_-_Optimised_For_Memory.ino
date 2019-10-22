@@ -1112,5 +1112,21 @@ void print_all_commands(){
   Serial.println(controller.GetKd());
   Serial.println(controller.GetMode());
  }
-//
+//Method to test fastest path
+void Fastest(){
+  FASTEST_PATH = true;
+
+
+}
+
+//method to test normal exploration
+void Explore(){
+  move_forward(3);
+  rotate_right(90);
+  move_forward(2);
+  rotate_left(90);
+  move_forward(9);
+  rotate_left(90);
+  move_forward(2);
+}
 //U
