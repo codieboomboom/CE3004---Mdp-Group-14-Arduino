@@ -67,7 +67,7 @@ byte count = 0;
 //Operating states
 bool FASTEST_PATH = false;
 bool DEBUG = false;
-byte delayExplore = 15;
+byte delayExplore = 1;
 byte delayFastestPath = 15;
 //For sensors meian filter
 #define SAMPLE 50
@@ -854,13 +854,13 @@ void right_wall_calibrate(){
 
     if(difference >= 0.05){ //&& distance_back < 25){ //If the robot tilts to the right 
       md.setSpeeds(rpm_to_speed_1(-20),rpm_to_speed_2(20));
-      delay(15);
+      delay(5);
       md.setBrakes(50,50);
     }
     
     else if(difference <= -0.05 ){//&& distance_back  < 25){ //If the robot tilts to the left
       md.setSpeeds(rpm_to_speed_1(20),rpm_to_speed_2(-20));
-      delay(15);
+      delay(5);
       md.setBrakes(50,50);
     }
     
@@ -932,14 +932,14 @@ void front_calibrate(){
       if (difference > 0.03){
         //k++;
         md.setSpeeds(rpm_to_speed_1(-20),rpm_to_speed_2(20));
-        delay(10);
+        delay(5);
         md.setBrakes(50,50);
       }
   
       else if(difference < -0.03){
         //k++;
         md.setSpeeds(rpm_to_speed_1(20),rpm_to_speed_2(-20));
-        delay(10);
+        delay(5);
         md.setBrakes(50,50);
       }
   
@@ -974,14 +974,14 @@ void front_calibrate(){
       k--;
       if (distance_left < ideal || distance_right < ideal){
         md.setSpeeds(rpm_to_speed_1(-20),rpm_to_speed_2(-20));
-        delay(15);
+        delay(5);
         md.setBrakes(50,50);
       }
   
       else if (distance_left > ideal || distance_right > ideal)
       {
         md.setSpeeds(rpm_to_speed_1(20),rpm_to_speed_2(20));
-        delay(15);
+        delay(5);
         md.setBrakes(50,50);
       }
       else
