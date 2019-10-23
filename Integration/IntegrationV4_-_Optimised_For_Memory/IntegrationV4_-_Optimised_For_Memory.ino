@@ -318,6 +318,8 @@ void rotate_right(double degree)
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
+      Serial.print("Travelled: ");
+      Serial.println(tick_travelled);
       //oldTick2 = tick2;
       //oldTick1 = tick1;
   }
@@ -340,7 +342,7 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 395;
+  target_tick = 391;
 
   if(FASTEST_PATH){
     target_tick = 398;
@@ -381,10 +383,14 @@ void rotate_left(double degree)
 
       //Serial.print(currentTick1); //for debug
       //Serial.print(" "); Serial.println(currentTick2);
+
       PIDControlLeft.Compute();
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
+      
+      Serial.print("Travelled: ");
+      Serial.println(tick_travelled);
       //oldTick2 = tick2;
       //oldTick1 = tick1;
   }
@@ -440,12 +446,12 @@ void move_forward(byte distance){
    }
       
    else
-      target_tick = 291 ;
+      target_tick = 287 ; //289
    double tick_travelled = 0;
    
 //   if(DEBUG){
-//   Serial.print("Target: ");
-//   Serial.println(target_tick);
+  Serial.print("Target: ");
+  Serial.println(target_tick);
 //   }
 
    if(target_tick<0) return;
@@ -504,6 +510,8 @@ void move_forward(byte distance){
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
+      Serial.print("Travelled: ");
+      Serial.println(tick_travelled);
       //oldTick2 = tick2;
       //oldTick1 = tick1;
 //      if (int(tick_travelled) == 300 || int(tick_travelled) == 600 || int(tick_travelled) == 900 ||int(tick_travelled) == 1200 ||int(tick_travelled) == 1500 || int(tick_travelled) == 1800 ||int(tick_travelled) == 2100 || int(tick_travelled) == 2400 || int(tick_travelled) == 2700)
@@ -1113,20 +1121,20 @@ void print_all_commands(){
   Serial.println(controller.GetMode());
  }
 //Method to test fastest path
-void Fastest(){
-  FASTEST_PATH = true;
+// void Fastest(){
+//   FASTEST_PATH = true;
 
 
-}
+// }
 
-//method to test normal exploration
-void Explore(){
-  move_forward(3);
-  rotate_right(90);
-  move_forward(2);
-  rotate_left(90);
-  move_forward(9);
-  rotate_left(90);
-  move_forward(2);
-}
+// //method to test normal exploration
+// void Explore(){
+//   move_forward(3);
+//   rotate_right(90);
+//   move_forward(2);
+//   rotate_left(90);
+//   move_forward(9);
+//   rotate_left(90);
+//   move_forward(2);
+// }
 //U
