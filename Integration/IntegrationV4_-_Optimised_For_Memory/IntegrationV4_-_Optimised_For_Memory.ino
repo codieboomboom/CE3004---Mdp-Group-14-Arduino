@@ -333,7 +333,7 @@ void rotate_right(double degree)
    Serial.println("PID controller right OFF: ");
    PIDdebug(PIDControlRight);
    
-   delay(15);
+   delay(delayExplore);
    if(FASTEST_PATH)
       delay(delayFastestPath);
 }
@@ -402,7 +402,7 @@ void rotate_left(double degree)
    PIDControlLeft.SetMode(MANUAL); //turn off PID
    Serial.println("PID controller left OFF: ");
    PIDdebug(PIDControlLeft);
-   delay(15);
+   delay(delayExplore);
    if(FASTEST_PATH)
       delay(delayFastestPath);
 }
@@ -529,7 +529,7 @@ void move_forward(byte distance){
    Serial.println("PID controller straight END: ");
    PIDdebug(PIDControlStraight);
    Serial.println("MC");
-   delay(15);
+   delay(delayExplore);
    if(FASTEST_PATH)
       delay(delayFastestPath);
 }
