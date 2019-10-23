@@ -807,20 +807,20 @@ void right_wall_calibrate(){
   if(distance_front <10.5 || distance_back <10.5){ 
     //If robot is too close to the rightwall
       rotate_right(90);
-      delay(50);
+      delay(10);
       front_calibrate();
       delay(20);
       rotate_left(90);
-      delay(20);
+      delay(10);
     }
 
    else if (distance_front > 12 || distance_back > 12){
       rotate_right(90);
-      delay(50);
+      delay(10);
       front_calibrate();
       delay(20);
       rotate_left(90);
-      delay(20);
+      delay(10);
    }
    
    //otherwise only need to calibrate angle   
