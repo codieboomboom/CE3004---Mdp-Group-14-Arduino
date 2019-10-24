@@ -67,8 +67,8 @@ byte count = 0;
 //Operating states
 bool FASTEST_PATH = false;
 bool DEBUG = false;
-byte delayExplore = 1;
-byte delayFastestPath = 15;
+byte delayExplore = 2.5;
+byte delayFastestPath = 30;
 //For sensors meian filter
 #define SAMPLE 50
 
@@ -94,7 +94,7 @@ PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
  * ==============================
  */
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setTimeout(50);
   if (DEBUG){
     Serial.println("Connected");
