@@ -446,7 +446,7 @@ void move_forward(byte distance){
    }
       
    else
-      target_tick = 287 ; //289
+      target_tick = 278 ; //289
    double tick_travelled = 0;
    
 //   if(DEBUG){
@@ -780,7 +780,7 @@ void right_wall_calibrate(){
   double distance_front = 0;
   double distance_back = 0;
   boolean distance_calibrate_only = false;
-  byte i = 35;
+  byte i = 80;
 
   //calibrate distance first by front calibrate
   if (!has_obstacle_right_front() && !has_obstacle_right_back()){
@@ -853,13 +853,13 @@ void right_wall_calibrate(){
     
 
     if(difference >= 0.05){ //&& distance_back < 25){ //If the robot tilts to the right 
-      md.setSpeeds(rpm_to_speed_1(-50),rpm_to_speed_2(50));
+      md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
       delay(2.5);
       md.setBrakes(200,200);
     }
     
     else if(difference <= -0.05 ){//&& distance_back  < 25){ //If the robot tilts to the left
-      md.setSpeeds(rpm_to_speed_1(50),rpm_to_speed_2(-50));
+      md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
       delay(2.5);
       md.setBrakes(200,200);
     }
@@ -880,7 +880,7 @@ void front_calibrate(){
   double distance_right = 0;
   double difference = 0;
   double ideal = 11;
-  byte k = 20;
+  byte k = 40;
   byte j = 2;
   bool only_distance_calibrate = false;
 
@@ -931,14 +931,14 @@ void front_calibrate(){
       //calibrate the angle by rotate left/right
       if (difference > 0.03){
         //k++;
-        md.setSpeeds(rpm_to_speed_1(-50),rpm_to_speed_2(50));
+        md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
         delay(2.5);
         md.setBrakes(200,200);
       }
   
       else if(difference < -0.03){
         //k++;
-        md.setSpeeds(rpm_to_speed_1(50),rpm_to_speed_2(-50));
+        md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
         delay(2.5);
         md.setBrakes(200,200);
       }
@@ -955,7 +955,7 @@ void front_calibrate(){
     if(DEBUG && only_distance_calibrate == false)
       Serial.println("Done calibrating angle front");
     
-    k = 15;
+    k = 40;
     
     //calibrating distance
     while (k>0){
@@ -973,14 +973,14 @@ void front_calibrate(){
       }  
       k--;
       if (distance_left < ideal || distance_right < ideal){
-        md.setSpeeds(rpm_to_speed_1(-50),rpm_to_speed_2(-50));
+        md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(-70));
         delay(2.5);
         md.setBrakes(200,200);
       }
   
       else if (distance_left > ideal || distance_right > ideal)
       {
-        md.setSpeeds(rpm_to_speed_1(50),rpm_to_speed_2(50));
+        md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(70));
         delay(2.5);
         md.setBrakes(200,200);
       }
