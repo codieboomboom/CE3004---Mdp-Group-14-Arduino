@@ -1,3 +1,4 @@
+
 /*
  * Version: 4.0
  * 
@@ -852,13 +853,13 @@ void right_wall_calibrate(){
     i--;                                          
     
 
-    if(difference >= 0.05){ //&& distance_back < 25){ //If the robot tilts to the right 
+    if(difference >= 0.03){ //&& distance_back < 25){ //If the robot tilts to the right 
       md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
       delay(2.5);
       md.setBrakes(200,200);
     }
     
-    else if(difference <= -0.05 ){//&& distance_back  < 25){ //If the robot tilts to the left
+    else if(difference <= -0.03 ){//&& distance_back  < 25){ //If the robot tilts to the left
       md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
       delay(2.5);
       md.setBrakes(200,200);
