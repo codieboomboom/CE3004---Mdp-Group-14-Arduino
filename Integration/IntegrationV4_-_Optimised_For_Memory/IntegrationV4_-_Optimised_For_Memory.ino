@@ -276,7 +276,7 @@ void rotate_right(double degree)
 {
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
-  target_tick = 380;
+  target_tick = 378;
 
   if (FASTEST_PATH){
     target_tick = 394;
@@ -446,7 +446,7 @@ void move_forward(byte distance){
    }
       
    else
-      target_tick = 278 ; //289
+      target_tick = 284 ; //289
    double tick_travelled = 0;
    
 //   if(DEBUG){
@@ -809,18 +809,18 @@ void right_wall_calibrate(){
       rotate_right(90);
       delay(10);
       front_calibrate();
-      delay(20);
+      delay(40);
       rotate_left(90);
-      delay(10);
+      delay(20);
     }
 
    else if (distance_front > 12 || distance_back > 12){
       rotate_right(90);
       delay(10);
       front_calibrate();
-      delay(20);
+      delay(40);
       rotate_left(90);
-      delay(10);
+      delay(20);
    }
    
    //otherwise only need to calibrate angle   
@@ -1120,21 +1120,25 @@ void print_all_commands(){
   Serial.println(controller.GetKd());
   Serial.println(controller.GetMode());
  }
-//Method to test fastest path
+// //Method to test fastest path
 // void Fastest(){
 //   FASTEST_PATH = true;
-
-
 // }
 
-// //method to test normal exploration
+// // //method to test normal exploration
 // void Explore(){
 //   move_forward(3);
+//   delay(30);
 //   rotate_right(90);
+//   delay(30);
 //   move_forward(2);
+//   delay(30);
 //   rotate_left(90);
+//   delay(30);
 //   move_forward(9);
+//   delay(30);
 //   rotate_left(90);
+//   delay(30);
 //   move_forward(2);
 // }
 //U
