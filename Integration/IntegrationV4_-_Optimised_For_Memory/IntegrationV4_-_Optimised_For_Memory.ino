@@ -69,7 +69,7 @@ byte count = 0;
 bool FASTEST_PATH = false;
 bool DEBUG = false;
 byte delayExplore = 2.5;
-byte delayFastestPath = 30;
+byte delayFastestPath = 500;
 //For sensors meian filter
 #define SAMPLE 50
 
@@ -85,9 +85,9 @@ SharpIR right_back(SharpIR:: GP2Y0A21YK0F, A4);
 SharpIR long_left(SharpIR:: GP2Y0A02YK0F, A5);
 
 //Refer to end of program for explanation on PID
-PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 4, 0, 0.1, DIRECT);
-PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
-PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0, DIRECT);
+PID PIDControlStraight(&currentTick1, &speed1, &currentTick2, 3.5, 0, 0.75, DIRECT);
+PID PIDControlLeft(&currentTick1, &speed1, &currentTick2, 3, 0, 0.5, DIRECT);
+PID PIDControlRight(&currentTick1, &speed1, &currentTick2, 3, 0, 0.5, DIRECT);
 
 /*
  * ==============================
@@ -142,8 +142,17 @@ void setup() {
 //  left = sensor_reading[SAMPLE/2]; 
 //  Serial.print(right_front_1);Serial.print(" "); Serial.print(right_back_1); Serial.print(" "); Serial.println(left);
 //  }
-// Fastest();
-// Explore();
+//Fastest();
+//while(true)
+//Explore();
+//while (true)
+//  calibrate_sensor_print();
+//  delay(50);
+//}
+//while(true){
+//  move_forward(1);
+//    delay(500);
+//}
 }
 
 void loop() {
@@ -233,7 +242,7 @@ void loop() {
 
       case 'S':
       case 's':
-        read_all_sensors(10);
+        read_all_sensors(15);
         break;
 
       case 'E':
@@ -277,10 +286,10 @@ void rotate_right(double degree)
 {
   double target_tick = 0; 
   //target_tick =4.3589*degree - 32.142;
-  target_tick = 378;
+  target_tick = 372;
 
   if (FASTEST_PATH){
-    target_tick = 394;
+    target_tick = 380;
   }
   //0.2319*degree + 6.4492;
   double tick_travelled = 0;
@@ -297,9 +306,9 @@ void rotate_right(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlRight.SetSampleTime(25); //Controller is called every 25ms
+  PIDControlRight.SetSampleTime(15); //Controller is called every 25ms
   if (FASTEST_PATH){
-    PIDControlRight.SetTunings(4,0, 0.01);
+    PIDControlRight.SetTunings(4,0, 0.5);
     PIDControlRight.SetSampleTime(15); // less aggressive
   }
   PIDControlRight.SetMode(AUTOMATIC); //Controller is invoked automatically.
@@ -325,10 +334,11 @@ void rotate_right(double degree)
       //oldTick1 = tick1;
   }
 
-     for (word i = 0; i <= 400; i+=200){
-     md.setBrakes(i,i);
-     delay(1); 
-   }
+//     for (word i = 0; i <= 400; i+=200){
+//     md.setBrakes(i,i);
+//     delay(1);
+//} 
+   md.setBrakes(400,400);
    PIDControlRight.SetMode(MANUAL);
    
    Serial.println("PID controller right OFF: ");
@@ -343,10 +353,10 @@ void rotate_right(double degree)
 void rotate_left(double degree)
 {
   double target_tick = 0;
-  target_tick = 391;
+  target_tick = 384;
 
   if(FASTEST_PATH){
-    target_tick = 398;
+    target_tick = 378;
   }
   //target_tick = 4.1533*degree; 
   double tick_travelled = 0;
@@ -366,9 +376,9 @@ void rotate_left(double degree)
   md.setSpeeds(speed1,speed2);
   tick_travelled = (double)tick2;
 
-  PIDControlLeft.SetSampleTime(25); //Controller is called every 50ms
+  PIDControlLeft.SetSampleTime(15); //Controller is called every 50ms
   if (FASTEST_PATH){
-    PIDControlLeft.SetTunings(5,0, 0.01);
+    PIDControlLeft.SetTunings(5,0, 0.5);
     PIDControlLeft.SetSampleTime(15);
   }
   PIDControlLeft.SetMode(AUTOMATIC); //Controller is invoked automatically.
@@ -396,10 +406,11 @@ void rotate_left(double degree)
       //oldTick1 = tick1;
   }
 
-     for (word i = 0; i <= 400; i+=200){
-     md.setBrakes(i,i);
-     delay(1); 
-   }
+//     for (word i = 0; i <= 400; i+=200){
+//     md.setBrakes(i,i);
+//     delay(1); 
+//   }
+   md.setBrakes(400,400);
    PIDControlLeft.SetMode(MANUAL); //turn off PID
    Serial.println("PID controller left OFF: ");
    PIDdebug(PIDControlLeft);
@@ -463,14 +474,14 @@ void move_forward(byte distance){
    oldTick1 = oldTick2 = 0;
 
    //Speed in rpm for motor 1 and 2
-   if (FASTEST_PATH)
-   {
-    rpm1 = 99.4;
+   if (FASTEST_PATH) {
+    rpm1 = 100.5;
+    // rpm1 = 99.8;
     rpm2 = 100;
    }
    else{
-    rpm1 = 82.5;
-    rpm2 = 83;
+    rpm1 = 84.5;
+    rpm2 = 84.5;
    }
    speed1 = rpm_to_speed_1(rpm1); //70.75 //74.9  100
    speed2 = rpm_to_speed_2(rpm2); //70.5 //74.5 99.5
@@ -480,23 +491,23 @@ void move_forward(byte distance){
 //   Serial.println(speed2);
 
    //Implementing gradual acceleration to remove jerks
-   for (word j = 0; j < speed2; j+=50){
-     md.setSpeeds(j,j-2.5);
-     delay(5); 
-   }
+//   for (word j = 0; j < speed2; j+=50){
+//     md.setSpeeds(j,j-2.5);
+//     delay(5); 
+//   }
 
    //Set Final ideal speed and accomodate for the ticks we used in acceleration
    md.setSpeeds(speed1,speed2);
    tick_travelled = (double)tick2;
-   PIDControlStraight.SetSampleTime(25); //Controller is called every 25ms
+   PIDControlStraight.SetSampleTime(6.5); //Controller is called every 25ms
 
    if(FASTEST_PATH){//turn on PID tuning if fastest path
-     PIDControlStraight.SetTunings(11,0.1, 1.5);
-     PIDControlStraight.SetSampleTime(15);
+     PIDControlStraight.SetTunings(10, 0, 1);
+     PIDControlStraight.SetSampleTime(8);
    }
    PIDControlStraight.SetMode(AUTOMATIC); //Controller is invoked automatically using default value for PID
-   Serial.println("PID controller straight: ");
-   PIDdebug(PIDControlStraight);
+//   Serial.println("PID controller straight: ");
+//   PIDdebug(PIDControlStraight);
 
 
    while(tick_travelled < target_tick){
@@ -504,15 +515,15 @@ void move_forward(byte distance){
       currentTick1 = tick1 - oldTick1; //calculate the ticks travelled in this sample interval of 50ms
       currentTick2 = tick2 - oldTick2;
       
-//      Serial.print(currentTick1); //for debug
-//      Serial.print(" "); Serial.println(currentTick2);
+      Serial.print(currentTick1); //for debug
+      Serial.print(" "); Serial.println(currentTick2);
       PIDControlStraight.Compute();
 
       oldTick2 += currentTick2; //update ticks
       oldTick1 += currentTick1;
       tick_travelled += currentTick2;
-      Serial.print("Travelled: ");
-      Serial.println(tick_travelled);
+//      Serial.print("Travelled: ");
+//      Serial.println(tick_travelled);
       //oldTick2 = tick2;
       //oldTick1 = tick1;
 //      if (int(tick_travelled) == 300 || int(tick_travelled) == 600 || int(tick_travelled) == 900 ||int(tick_travelled) == 1200 ||int(tick_travelled) == 1500 || int(tick_travelled) == 1800 ||int(tick_travelled) == 2100 || int(tick_travelled) == 2400 || int(tick_travelled) == 2700)
@@ -522,13 +533,14 @@ void move_forward(byte distance){
       
    }
    
-   for (word i = 0; i <= 400; i+=50){
-     md.setBrakes(i-5,i+5);
-     delay(2.5); 
-   }
+//   for (word i = 0; i <= 400; i+=50){
+//     md.setBrakes(i-5,i+5);
+//     delay(2.5); 
+//   }
+   md.setBrakes(370,400);
    PIDControlStraight.SetMode(MANUAL);
-   Serial.println("PID controller straight END: ");
-   PIDdebug(PIDControlStraight);
+//   Serial.println("PID controller straight END: ");
+//   PIDdebug(PIDControlStraight);
    Serial.println("MC");
    delay(delayExplore);
    if(FASTEST_PATH)
@@ -719,6 +731,24 @@ void read_all_sensors(byte delay_time){
   
 }
 
+void calibrate_sensor_print(){
+  //method to print out calibrate sensor value
+  double difference = 0;
+  double distance_front = 0;
+  double distance_back = 0;
+  for (byte j = 10; j>0; j--){
+      distance_front += right_front.getDistance(true);
+      distance_back += right_back.getDistance(true);
+    }
+  distance_front /= 10;
+  distance_back /= 10;
+  difference = distance_front - distance_back;
+  Serial.print("distance_front, distance_back, difference: ");
+  Serial.print(distance_front);Serial.print(";");
+  Serial.print(distance_back);Serial.print(";");
+  Serial.print(difference);Serial.println();
+}
+
 
 
 
@@ -810,7 +840,7 @@ void right_wall_calibrate(){
       rotate_right(90);
       delay(10);
       front_calibrate();
-      delay(40);
+      delay(20);
       rotate_left(90);
       delay(20);
     }
@@ -819,7 +849,7 @@ void right_wall_calibrate(){
       rotate_right(90);
       delay(10);
       front_calibrate();
-      delay(40);
+      delay(20);
       rotate_left(90);
       delay(20);
    }
@@ -831,14 +861,14 @@ void right_wall_calibrate(){
     Serial.println(distance_calibrate_only);
   }
   while(i > 0 && distance_calibrate_only == false){
-    for (byte j = 10; j>0; j--){
+    for (byte j = 15; j>0; j--){
       distance_front += right_front.getDistance(true);
       distance_back += right_back.getDistance(true);
     }
-    distance_front /= 10;
-    distance_back /= 10;
+    distance_front /= 15;
+    distance_back /= 15;
     
-    difference = (distance_front - distance_back);
+    difference = (distance_front + 0.95  - distance_back);
     
     if(DEBUG){
       Serial.println(" ");
@@ -853,16 +883,16 @@ void right_wall_calibrate(){
     i--;                                          
     
 
-    if(difference >= 0.03){ //&& distance_back < 25){ //If the robot tilts to the right 
-      md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
+    if(difference >= 0.01){ //&& distance_back < 25){ //If the robot tilts to the right 
+      md.setSpeeds(rpm_to_speed_1(-100),rpm_to_speed_2(100));
       delay(2.5);
-      md.setBrakes(200,200);
+      md.setBrakes(400,400);
     }
     
-    else if(difference <= -0.03 ){//&& distance_back  < 25){ //If the robot tilts to the left
-      md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
+    else if(difference <= -0.01){//&& distance_back  < 25){ //If the robot tilts to the left
+      md.setSpeeds(rpm_to_speed_1(100),rpm_to_speed_2(-100));
       delay(2.5);
-      md.setBrakes(200,200);
+      md.setBrakes(400,400);
     }
     
     else{ // If difference is in between 0.035 to -0.035
@@ -881,8 +911,8 @@ void front_calibrate(){
   double distance_right = 0;
   double difference = 0;
   double ideal = 11;
-  byte k = 40;
-  byte j = 2;
+  byte k = 50;
+  byte j = 4;
   bool only_distance_calibrate = false;
 
   if (!has_obstacle_front_left() && !has_obstacle_front_right())
@@ -932,16 +962,15 @@ void front_calibrate(){
       //calibrate the angle by rotate left/right
       if (difference > 0.03){
         //k++;
-        md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(70));
+        md.setSpeeds(rpm_to_speed_1(-100),rpm_to_speed_2(100));
         delay(2.5);
-        md.setBrakes(200,200);
+        md.setBrakes(400,400);
       }
-  
       else if(difference < -0.03){
         //k++;
-        md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(-70));
+        md.setSpeeds(rpm_to_speed_1(100),rpm_to_speed_2(-100));
         delay(2.5);
-        md.setBrakes(200,200);
+        md.setBrakes(400,400);
       }
   
       else
@@ -956,7 +985,7 @@ void front_calibrate(){
     if(DEBUG && only_distance_calibrate == false)
       Serial.println("Done calibrating angle front");
     
-    k = 40;
+    k = 50;
     
     //calibrating distance
     while (k>0){
@@ -974,14 +1003,14 @@ void front_calibrate(){
       }  
       k--;
       if (distance_left < ideal || distance_right < ideal){
-        md.setSpeeds(rpm_to_speed_1(-70),rpm_to_speed_2(-70));
+        md.setSpeeds(rpm_to_speed_1(-100),rpm_to_speed_2(-100));
         delay(2.5);
         md.setBrakes(200,200);
       }
   
       else if (distance_left > ideal || distance_right > ideal)
       {
-        md.setSpeeds(rpm_to_speed_1(70),rpm_to_speed_2(70));
+        md.setSpeeds(rpm_to_speed_1(100),rpm_to_speed_2(100));
         delay(2.5);
         md.setBrakes(200,200);
       }
@@ -1121,25 +1150,31 @@ void print_all_commands(){
   Serial.println(controller.GetKd());
   Serial.println(controller.GetMode());
  }
-// //Method to test fastest path
-// void Fastest(){
-//   FASTEST_PATH = true;
-// }
+ //Method to test fastest path
+ void Fastest(){
+   FASTEST_PATH = true;
+ }
 
-// // //method to test normal exploration
-// void Explore(){
-//   move_forward(3);
-//   delay(30);
-//   rotate_right(90);
-//   delay(30);
-//   move_forward(2);
-//   delay(30);
-//   rotate_left(90);
-//   delay(30);
-//   move_forward(9);
-//   delay(30);
-//   rotate_left(90);
-//   delay(30);
-//   move_forward(2);
-// }
+ // //method to test normal exploration
+ void Explore(){
+   move_forward(3);
+   delay(500);
+   rotate_right(90);
+   delay(500);
+   move_forward(2);
+   delay(500);
+   rotate_left(90);
+   delay(500);
+   move_forward(9);
+   delay(500);
+   rotate_left(90);
+   delay(500);
+   move_forward(2);
+ }
+
+ void Drain(){
+  while(true){
+    md.setSpeeds(400,400);
+  }
+ }
 //U
