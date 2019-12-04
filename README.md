@@ -6,6 +6,7 @@
 <ol>
 	<li> For Checklists: containing codes to clear the checklist. The current codes were written by Bronson Tan and serves as a general flow and algorithms guide on how to to clear the checklist (for each category of going straight, rotate left/right, sensors check and obstacle avoidance</li>
 	<li> Calibration & Scripts: The method of calibrating the encoders to motors speed by obtaining linear equation and select the suitable linear characteristic portion of the transfer graph. The calibration contains intial calibration of our encoders without loads and the Scripts contain a python code to automate the calculation of average values. Though some excel calculation is needed to finally obtain the RPM to PWM speed. Refer to details below </li>
+</ol>
 
 <h2>1. Hardware Components:</h2>
 Rough BOM for MDP (as provided by the school):
