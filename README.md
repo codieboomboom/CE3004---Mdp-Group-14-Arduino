@@ -1,6 +1,12 @@
 # CE3004---Mdp-Group-14-Arduino
 <p>A repo for hardware development of MDP group 14 project AY1920 S1. This documents are free for use by juniors to aid them in MDP process. Included below are hardware information, software library used, some control theory and tips and tricks on acing MDP.</p>
 
+<h2> Navigation Guidelines </h2>
+<p> Please following this order to understand the project best</p>
+<ol>
+	<li> For Checklists: containing codes to clear the checklist. The current codes were written by Bronson Tan and serves as a general flow and algorithms guide on how to to clear the checklist (for each category of going straight, rotate left/right, sensors check and obstacle avoidance</li>
+	<li> Calibration & Scripts: The method of calibrating the encoders to motors speed by obtaining linear equation and select the suitable linear characteristic portion of the transfer graph. The calibration contains intial calibration of our encoders without loads and the Scripts contain a python code to automate the calculation of average values. Though some excel calculation is needed to finally obtain the RPM to PWM speed. Refer to details below </li>
+
 <h2>1. Hardware Components:</h2>
 Rough BOM for MDP (as provided by the school):
 
