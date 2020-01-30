@@ -49,7 +49,16 @@ Rough BOM for MDP - Robot Kit (as provided by the school):
 <h4>Checklist 1: Going straight</h4>
 <p> KEEP THE ROBOT LIGHT!!!</p>
 <p> Install barely the Arduino kit, the battery, the motors, that's it. The less components, the easier it is to manourve its centre of gravity. There are 2 methods you may seek to clear this one easier and one harder. Both methods will still require a close attention to battery voltage level. GET YOURSELF A MULTI-METER EARLIER ON!!!</p>
+
 <p> Method 1: Drive by PWM </p>
+<li> Use the DualVNH Library to turn the motors forward. Due to errors and tolerances, the same value given (0-400) will not yield the same amount of rotation between the motors.</li>
+<li>Determine the two values of motor 1 and 2 (should be very close) such that both turns at the same rate and/or turn at a rate that feel like going straight for the 150cm required by the checklist.</li>
+<li>Replicate with constant battery conditions/ surface conditions.</li>
+
+<p> Method 2: Drive by RPM </p>
+<li>Obtain a calibration chart for each motor, note the controlled voltage level (like method 1)</li>
+<li>For each speed (0-400) with an interval of your choice (20-50 per step is good), use the encoders and ISR to measure the ticks generated. From there calculate the actual RPM rotated by each motor at each speed. Details can be found at <b>Calibration</b> folder.</li>
+<li>Make sure your battery/ surface is the same as calibrated condition, give the same rpm to both wheel (adjust the rpm if needed faster or slower) until robot can go straight.</li>
 
 <h3>4.2. Working towards first Exploration</h3>
 <h3>4.3. How to move on</h3>
