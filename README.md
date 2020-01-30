@@ -40,9 +40,17 @@ Rough BOM for MDP - Robot Kit (as provided by the school):
 <p> Rule 1: Don't rely on your prof, their answers will have little contribution on your robot. </p>
 <p> Rule 2: Check all of your robot components. Change any components earlier on, protect your components well (all hardware are fragile and prone to low error tolerance) </p>
 <p> Rule 3: Chase your teammates, force them to collaborate. Many times your teammate are blur or just slacking, make sure to scare them because you can shoot them down with the peer evaluation. </p>
-<p> Rule 4: Pray hard and try, try, try again. </p>
+<p> Rule 4: Practice scientific methodology in dev and test - ensure you can replicate the operation of robot by keeping light level, surface condition and battery level as constant as possible. You will learn about how these factors affect your robot as you go along.</p>
+<p> Rule 5: Pray hard and try, try, try again. </p>
 
 <h3>4.1. Clearing Checklist</h3>
+<p> There are 5 checklists for robot team: Going straight, Turn left/right, Sensor reading, Object Avoidance and Bonus Object Avoidance. As a rule of thumbs, seek to clear these by week 5, latest before recess week where the ramping up will start. </p>
+<p> Most of the groups will waste time doing the checklists so it is important to just clear the checklist fast and sneakily as all of them are useless to leaderboard anyway.</p>
+<h4>Checklist 1: Going straight</h4>
+<p> KEEP THE ROBOT LIGHT!!!</p>
+<p> Install barely the Arduino kit, the battery, the motors, that's it. The less components, the easier it is to manourve its centre of gravity. There are 2 methods you may seek to clear this one easier and one harder. Both methods will still require a close attention to battery voltage level. GET YOURSELF A MULTI-METER EARLIER ON!!!</p>
+<p> Method 1: Drive by PWM </p>
+
 <h3>4.2. Working towards first Exploration</h3>
 <h3>4.3. How to move on</h3>
 
