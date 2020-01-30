@@ -1,5 +1,5 @@
 # CE3004---Mdp-Group-14-Arduino
-<p>A repo for hardware development of MDP group 14 project AY1920 S1. This documents are free for use by juniors to aid them in MDP process. Included below are hardware information, software library used, some control theory and tips and tricks on acing MDP.</p>
+<p>A repo for hardware development of MDP group 14 project AY1920 S1. This documents are free for use by juniors to aid them in MDP process. Included below are hardware information, software library used, some control theory and tips and tricks on acing MDP. All SCSE students have mixed review about this mod, personally I believe it needs to be revamped!!!</p>
 
 <h2> Navigation Guidelines </h2>
 <p> Please following this order to understand the project best</p>
@@ -37,6 +37,11 @@ Rough BOM for MDP - Robot Kit (as provided by the school):
 <h2>3. Control Theory:</h2>
 
 <h2>4. Tips and Tricks:</h2>
+<p> Rule 1: Don't rely on your prof, their answers will have little contribution on your robot. </p>
+<p> Rule 2: Check all of your robot components. Change any components earlier on, protect your components well (all hardware are fragile and prone to low error tolerance) </p>
+<p> Rule 3: Chase your teammates, force them to collaborate. Many times your teammate are blur or just slacking, make sure to scare them because you can shoot them down with the peer evaluation. </p>
+<p> Rule 4: Pray hard and try, try, try again. </p>
+
 <h3>4.1. Clearing Checklist</h3>
 <h3>4.2. Working towards first Exploration</h3>
 <h3>4.3. How to move on</h3>
