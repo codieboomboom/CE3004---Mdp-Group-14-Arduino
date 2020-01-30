@@ -9,7 +9,8 @@
 </ol>
 
 <h2>1. Hardware Components:</h2>
-Rough BOM for MDP (as provided by the school):
+Rough BOM for MDP - Robot Kit (as provided by the school):
+*TODO*
 
 <h2>2. Software Library:</h2>
 <p>The following library are used in this project source code:</p>
@@ -22,6 +23,16 @@ Rough BOM for MDP (as provided by the school):
 		<p>This library is to interface with Sharp IR sensors used in this project. Students are given 2 types of sensors: GP2Y0A21YK0F (10-50 cm effective range) and GP2Y0A02YK0F(20-150 cm) effective range. Some people prefers offering the characteristic equation of their sensors by themselves, do refer below for the steps to do so. Otherwise using this library will do the job. 
 		Note: if less than 10 and 20cm, 9 and 19 will be returned. Details at this <a href="https://github.com/qub1750ul/Arduino_SharpIR">link</a></p>
 	</li>
+	<li><b>EnableInterrupt.h:</b>
+	<p>Arduino Uno only allows interrupts on limited amount of pins. This library allow interrupt event for all digital pins on the Uno board. This is important to develop ISR for ticks and encode handling.</p>
+	</li>
+	<li><b>PID_v1.h:</b>
+	<p>PID algorithm might be too time-consuming to develop in this 12 weeks project. *Readers are highly encouraged to skipped the theory of PID and use this library*. Final codes have 1 portion at the end to explain PID in details should the readers are curious about the idea behind this algorithm</p>
+	</li>
+	<li><b>ArduinoSort.h:</b>
+	<p>Just an insertion sort algorithm for implementing median filtering of sensor value. Other sorting algo will works too. But take note of the limited time between each steps in the maze and/or limited memory resource of the Arduino Board</p>
+	</li>
+	
 </ul>
 <h2>3. Control Theory:</h2>
 
