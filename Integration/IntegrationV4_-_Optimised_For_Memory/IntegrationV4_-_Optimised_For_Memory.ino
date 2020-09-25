@@ -114,6 +114,16 @@ void setup() {
   //init values
   currentTick1 = currentTick2 = oldTick1 = oldTick2 = 0;
 
+/*
+*This commented segment was for calibration during MDP competition run, 
+*it merely helps to check if all the robot functinality works (distance
+*from sensors to the blocks is read correctly, rotation and moving of robot 
+*is as expected, any deviation due to battery, etc before quarantine for real run.
+*
+*You may uncomment this segment or just delete it as is not needed
+*/
+
+
 //s
 //  
 //while (true){
@@ -155,6 +165,10 @@ void setup() {
 //}
 }
 
+/*
+* Main loop of the robot is repeated infinitely, the algo should be to get 
+* commands from the RPi, process them and repeat the process.
+*/
 void loop() {
   get_command();
   //Debug to see all commands collected.
@@ -551,6 +565,8 @@ void move_forward(byte distance){
  * ==============================================================
  * Sensors
  * Methods dealing with data acquisition and processing of sensor
+ * All of them use median filtering for the sensor readings
+ * This is highly dependent on your sensor placements on the robot.
  * ==============================================================
  */
 
@@ -754,7 +770,10 @@ void calibrate_sensor_print(){
 
 //+++++++++++++++++++++++++++++++++++++++++
 
-//Methods for detect object in front of sensors, for clearance purpose ++++++++++++++++++++++++++++
+//Methods for detect object in front of sensors, for clearance purpose 
+
+//++++++++++++++++++++++++++++
+
 
 bool has_obstacle_front_center(){
   if (distance_short_front_center() == 1 && distance_short_front_center()!=-1 )
@@ -1150,12 +1169,22 @@ void print_all_commands(){
   Serial.println(controller.GetKd());
   Serial.println(controller.GetMode());
  }
+
+/*
+ * ============================
+ * More Testing and Simulation
+ * ============================
+ *
+ * In the absence of Rpi and Algo, we can roughly simulate some activities of the robot.
+ *
+ */
+
  //Method to test fastest path
  void Fastest(){
    FASTEST_PATH = true;
  }
 
- // //method to test normal exploration
+ //method to test normal exploration
  void Explore(){
    move_forward(3);
    delay(500);
@@ -1172,6 +1201,7 @@ void print_all_commands(){
    move_forward(2);
  }
 
+//This was to drain fully charge battery to a suitable voltage.
  void Drain(){
   while(true){
     md.setSpeeds(400,400);
