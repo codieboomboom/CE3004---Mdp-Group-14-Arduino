@@ -1,6 +1,36 @@
 # CE3004---Mdp-Group-14-Arduino
 A repo for hardware development of MDP group 14 project AY1920 S1. This documents are free for use by juniors to aid them in MDP process. Included below are hardware information, software library used, some control theory and tips and tricks on acing MDP. All SCSE students have mixed review about this mod, personally I believe it needs to be revamped!!!
 
+## Project Overview (full-team):
+This is "Ideally" a very good course as it teach students about robotics with topical tasks such as path planning, exploration, navigation, perception, mapping, etc. A project team of 8-10 are supposedly complete the following features within a semester (which is absurd giving the hardware limitations, knowledges limitations and workloads of other modules):
+
+1. Algorithm Team - Path planning, Mapping, Localization, Navigation
+
+The last that I know, the codebase should be in Java. Main goal of this sub-team is to generate an empty 2D occupancy map, using some navigation and graph planning algorithm and integrate with sensor data (such as IR sensors, ultrasonic sensors) to detect blocks in the maze and map them out in occupancy map (probabilistic model in robotics).
+
+At the end of exploration, the accurate map of the mazed should be generated and the robot is to attempt a fastest path test where it runs from start to end position of the maze in as shortest time as possible.
+
+Whoever do this part, they will have to be able to do some algorithm simulation of the robot on the computer (good for algorithmic people lol)
+
+2. Arduino Team - Platform and APIs for robot mobility (to achieve some higher level classes)
+
+In order for robot to be able localise itself in the maze, sensory information are important as this help to roughly gauge its pose in the predetermined maze (and so grid). The algorithm cannot work in real life if the robot cannot move and if the robot is blind (cannot sense what is around it or how fast it has been moving).
+
+The Arduino team are often consists of CE students, who are supposed to be well versed in microcontroller programming techniques, DSP, sensors and signals, etc. This sub team will be working with 2-3 sensors below:
+
+* Acoustic Sensors (Ultrasonic Sensors) - very low resolution and echo-ing problem in the maze -> generate absolute position information
+* Infrared Rangefinders - 5 shorts range and 2 long range sensors providing, more accurate than the above one -> generate absolute position information
+* Wheel encoders - for wheel odometry by interrupts to determined how much the wheel have been rotated -> generate relative position information
+
+These sensors should be calibrated and integrated with the Arduno Uno microcontroller and passed through some signal processing such as ADC before it is reported to the Algorithm for update of the map, navigation and mobility, etc.
+
+The team will also be responsible for mobility of the robot, making sure that the robot can rotate and go straight accordingly, and ensure good calibration of relevant components to minimise drifting of the wheels, etc.
+
+NOTE: THIS IS TOUGH AS MOST OF US ARE NOT EVEN WELL-TRAINED IN ROBOTICS TO BEGIN WITH.
+
+3. Rpi team - Communication, Scheduling, Image Processing:
+4. Android team - Human Machine Interface
+
 ## Navigate this repo
 Please following this order to understand the project best:
 	
